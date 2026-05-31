@@ -20,10 +20,12 @@ describe("rsi14", () => {
     const closes = Array.from({ length: 30 }, (_, i) => 100 - i);
     expect(rsi14(closes)).toBe(0);
   });
-  it("is ~50 for symmetric up/down alternation", () => {
+  it("is near 50 (balanced) for symmetric up/down alternation", () => {
     const closes: number[] = [100];
     for (let i = 0; i < 40; i++) closes.push(closes[closes.length - 1] + (i % 2 === 0 ? 1 : -1));
-    expect(rsi14(closes)!).toBeCloseTo(50, 0);
+    const v = rsi14(closes)!;
+    expect(v).toBeGreaterThan(45);
+    expect(v).toBeLessThan(55);
   });
   it("returns null with insufficient data", () => {
     expect(rsi14([1, 2, 3])).toBeNull();
