@@ -69,8 +69,10 @@ export function parseWatchlistCsv(text: string): WatchlistConfig {
 }
 
 export async function fetchWatchlistConfig(sheetId: string, gid: string): Promise<WatchlistConfig> {
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
-  const res = await fetch(url, { next: { revalidate: 300 } });
+  // Server-side fetch (no CORS concern). /export returns the raw CSV with the original
+  // "No" header row; gviz/tq blanks numeric-column headers (incl. "No") and breaks parsing.
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+  const res = await fetch(url, { redirect: "follow", next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`sheet fetch failed: ${res.status}`);
   return parseWatchlistCsv(await res.text());
 }
