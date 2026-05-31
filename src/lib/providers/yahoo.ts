@@ -1,45 +1,46 @@
-// yahoo-finance2 v2.14.0: the static `quote` this-context doesn't satisfy
-// `ModuleThis` in its own type declarations. Casting to `any` is the minimal
-// fix — runtime behaviour is identical.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import _yahooFinance from "yahoo-finance2";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const yf = _yahooFinance as any;
-
 export type Quote = {
   price: number; previousClose: number; volume: number;
   high52: number; low52: number; marketTime: number;
 };
 export type DailyHistory = { closes: number[]; volumes: number[] };
+export type YahooData = { quote: Quote; history: DailyHistory };
 
-export async function getQuote(ticker: string): Promise<Quote | null> {
-  try {
-    const q = await yf.quote(ticker);
-    if (q?.regularMarketPrice == null) return null;
-    return {
-      price: q.regularMarketPrice,
-      previousClose: q.regularMarketPreviousClose ?? q.regularMarketPrice,
-      volume: q.regularMarketVolume ?? 0,
-      high52: q.fiftyTwoWeekHigh ?? q.regularMarketPrice,
-      low52: q.fiftyTwoWeekLow ?? q.regularMarketPrice,
-      marketTime: q.regularMarketTime ? new Date(q.regularMarketTime).getTime() : Date.now(),
-    };
-  } catch {
-    return null;
-  }
-}
+const CHART_BASES = [
+  "https://query2.finance.yahoo.com",
+  "https://query1.finance.yahoo.com",
+];
 
-export async function getDailyHistory(ticker: string): Promise<DailyHistory | null> {
-  try {
-    const period1 = new Date();
-    period1.setFullYear(period1.getFullYear() - 2);
-    const chart = await yf.chart(ticker, { period1, interval: "1d" });
-    const quotes = chart?.quotes ?? [];
-    const closes = quotes.map((c: { close: unknown }) => c.close).filter((v: unknown): v is number => v != null);
-    const volumes = quotes.map((c: { volume: unknown }) => c.volume).filter((v: unknown): v is number => v != null);
-    if (closes.length === 0) return null;
-    return { closes, volumes };
-  } catch {
-    return null;
+/** Yahoo v8 chart endpoint: one call returns live quote (meta) + daily history.
+ *  Server-side only (no CORS from browser). Keyless, no crumb on the chart route. */
+export async function getYahooData(ticker: string): Promise<YahooData | null> {
+  for (const base of CHART_BASES) {
+    try {
+      const url = `${base}/v8/finance/chart/${encodeURIComponent(ticker)}?range=2y&interval=1d`;
+      const res = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0" },
+        next: { revalidate: 300 },
+      });
+      if (!res.ok) continue;
+      const json = await res.json();
+      const result = json?.chart?.result?.[0];
+      const meta = result?.meta;
+      if (meta?.regularMarketPrice == null) continue;
+      const q = result?.indicators?.quote?.[0] ?? {};
+      const closes: number[] = (q.close ?? []).filter((v: number | null): v is number => v != null);
+      const volumes: number[] = (q.volume ?? []).filter((v: number | null): v is number => v != null);
+      const price: number = meta.regularMarketPrice;
+      const quote: Quote = {
+        price,
+        previousClose: meta.previousClose ?? closes[closes.length - 2] ?? price,
+        volume: meta.regularMarketVolume ?? volumes[volumes.length - 1] ?? 0,
+        high52: meta.fiftyTwoWeekHigh ?? (closes.length ? Math.max(...closes, price) : price),
+        low52: meta.fiftyTwoWeekLow ?? (closes.length ? Math.min(...closes, price) : price),
+        marketTime: meta.regularMarketTime ? meta.regularMarketTime * 1000 : Date.now(),
+      };
+      return { quote, history: { closes, volumes } };
+    } catch {
+      // try next base
+    }
   }
+  return null;
 }
