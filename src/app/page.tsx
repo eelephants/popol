@@ -14,20 +14,36 @@ export default function Page() {
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const prevInZone = useRef<Set<string>>(new Set());
+  const prevOversold = useRef<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [w, m] = await Promise.all([
-      fetch("/api/watchlist").then((r) => r.json()),
-      fetch("/api/macro").then((r) => r.json()).catch(() => null),
-    ]);
-    const next: EnrichedStock[] = w.stocks ?? [];
-    const nowInZone = new Set(next.filter((s) => s.zoneStatus === "in-zone").map((s) => s.ticker));
-    const fresh = [...nowInZone].filter((t) => !prevInZone.current.has(t));
-    if (prevInZone.current.size > 0 && fresh.length > 0) setToast(`${fresh.join(", ")} 매수존 진입!`);
-    prevInZone.current = nowInZone;
-    setStocks(next);
-    setMacro(m);
-    setUpdatedAt(w.updatedAt ?? Date.now());
+    try {
+      const [w, m] = await Promise.all([
+        fetch("/api/watchlist").then((r) => r.json()),
+        fetch("/api/macro").then((r) => r.json()).catch(() => null),
+      ]);
+      const next: EnrichedStock[] = w?.stocks ?? [];
+      setError(w?.error ? "데이터를 불러오지 못했습니다" : next.length === 0 ? "표시할 종목이 없습니다" : null);
+
+      const nowInZone = new Set(next.filter((s) => s.zoneStatus === "in-zone").map((s) => s.ticker));
+      const nowOversold = new Set(next.filter((s) => s.rsi14 != null && s.rsi14 < 30).map((s) => s.ticker));
+      const freshZone = [...nowInZone].filter((t) => !prevInZone.current.has(t));
+      const freshOversold = [...nowOversold].filter((t) => !prevOversold.current.has(t));
+      if (prevInZone.current.size > 0 || prevOversold.current.size > 0) {
+        const msgs: string[] = [];
+        if (freshZone.length) msgs.push(`${freshZone.join(", ")} 매수존 진입!`);
+        if (freshOversold.length) msgs.push(`${freshOversold.join(", ")} RSI<30 (과매도)`);
+        if (msgs.length) setToast(msgs.join(" · "));
+      }
+      prevInZone.current = nowInZone;
+      prevOversold.current = nowOversold;
+      setStocks(next);
+      setMacro(m);
+      setUpdatedAt(w?.updatedAt ?? Date.now());
+    } catch {
+      setError("네트워크 오류 — 잠시 후 다시 시도하세요");
+    }
   }, []);
 
   useEffect(() => {
@@ -45,6 +61,11 @@ export default function Page() {
   return (
     <main className="mx-auto max-w-md pb-10">
       <SummaryHeader stocks={stocks} macro={macro} />
+      {error && (
+        <div className="mx-3 my-2 rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700 dark:bg-red-900/40 dark:text-red-300">
+          {error}
+        </div>
+      )}
       <MacroDial macro={macro} />
       <StockList stocks={stocks} onSelect={setSelected} />
       <ThemeConcentration stocks={stocks} />

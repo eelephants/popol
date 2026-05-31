@@ -29,7 +29,9 @@ export function StockRow({ stock, onClick }: { stock: EnrichedStock; onClick?: (
         <span className="block text-xs text-zinc-500">{stock.ticker}</span>
       </span>
       <span className="text-right">
-        <span className="block tabular-nums">{stock.price != null ? `$${stock.price.toFixed(2)}` : "—"}</span>
+        <span className={`block tabular-nums ${stock.isStale ? "opacity-40" : ""}`} title={stock.isStale ? "지연/오프라인 데이터" : undefined}>
+          {stock.price != null ? `$${stock.price.toFixed(2)}` : "—"}
+        </span>
         <span className="flex items-center justify-end gap-1 text-xs">
           {stock.rsi14 != null && (
             <span className={rsiLow ? "font-semibold text-red-500" : "text-zinc-500"}>RSI {stock.rsi14.toFixed(0)}</span>

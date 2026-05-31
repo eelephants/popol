@@ -26,15 +26,22 @@ export async function getYahooData(ticker: string): Promise<YahooData | null> {
       const meta = result?.meta;
       if (meta?.regularMarketPrice == null) continue;
       const q = result?.indicators?.quote?.[0] ?? {};
-      const closes: number[] = (q.close ?? []).filter((v: number | null): v is number => v != null);
-      const volumes: number[] = (q.volume ?? []).filter((v: number | null): v is number => v != null);
+      const rawCloses: (number | null)[] = q.close ?? [];
+      const rawVolumes: (number | null)[] = q.volume ?? [];
+      const closes: number[] = [];
+      const volumes: number[] = [];
+      for (let i = 0; i < rawCloses.length; i++) {
+        if (rawCloses[i] == null) continue; // keep close & volume aligned to the same trading day
+        closes.push(rawCloses[i] as number);
+        volumes.push((rawVolumes[i] ?? 0) as number);
+      }
       const price: number = meta.regularMarketPrice;
       const quote: Quote = {
         price,
         previousClose: meta.previousClose ?? closes[closes.length - 2] ?? price,
         volume: meta.regularMarketVolume ?? volumes[volumes.length - 1] ?? 0,
-        high52: meta.fiftyTwoWeekHigh ?? (closes.length ? Math.max(...closes, price) : price),
-        low52: meta.fiftyTwoWeekLow ?? (closes.length ? Math.min(...closes, price) : price),
+        high52: meta.fiftyTwoWeekHigh ?? (closes.length ? Math.max(...closes.slice(-252), price) : price),
+        low52: meta.fiftyTwoWeekLow ?? (closes.length ? Math.min(...closes.slice(-252), price) : price),
         marketTime: meta.regularMarketTime ? meta.regularMarketTime * 1000 : Date.now(),
       };
       return { quote, history: { closes, volumes } };
