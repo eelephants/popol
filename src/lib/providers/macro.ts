@@ -12,14 +12,17 @@ export async function getTenYearYield(fredKey: string): Promise<number | null> {
   return vals[0] ?? null;
 }
 
-export async function getHySpread(fredKey: string): Promise<{ value: number; percentile1y: number } | null> {
+export async function getHySpread(
+  fredKey: string,
+): Promise<{ value: number; percentile1y: number; rising: boolean } | null> {
   if (!fredKey) return null;
   const vals = await fredObservations("BAMLH0A0HYM2", fredKey, 260);
   if (vals.length === 0) return null;
   const value = vals[0];
   const below = vals.filter((v) => v <= value).length;
   const percentile1y = (below / vals.length) * 100;
-  return { value, percentile1y };
+  const rising = vals.length >= 2 ? vals[0] > vals[1] : false; // vals sorted desc: latest > previous
+  return { value, percentile1y, rising };
 }
 
 export async function getFearGreed(): Promise<{ score: number; rating: string } | null> {

@@ -44,9 +44,12 @@ describe("macroRegime", () => {
   it("extreme greed → only the deepest zone", () => {
     expect(macroRegime(82, 4.4, 3.0, 20).activeZones).toEqual([25]);
   });
-  it("high-yield stress bumps one notch more cautious", () => {
-    const r = macroRegime(40, 4.6, 6.0, 95);
+  it("high-yield stress bumps one notch more cautious when rising", () => {
+    const r = macroRegime(40, 4.6, 6.0, 95, true);
     expect(r.activeZones).toEqual([20]);
+  });
+  it("high percentile but not rising does not bump", () => {
+    expect(macroRegime(40, 4.6, 6.0, 95, false).activeZones).toEqual([15]);
   });
   it("carries the raw inputs through", () => {
     const r = macroRegime(50, 4.5, 3.2, 55);

@@ -50,16 +50,17 @@ export function macroRegime(
   tenYear: number | null,
   hySpread: number | null,
   hySpreadPercentile: number | null,
+  hySpreadRising = false,
 ): MacroRegime {
   const base = REGIME_TABLE.find((r) => fng <= r.max) ?? REGIME_TABLE[REGIME_TABLE.length - 1];
   let zones = base.zones;
   let note = `공포탐욕 ${fng} → ${base.regime}`;
-  if (hySpreadPercentile != null && hySpreadPercentile >= 90) {
+  if (hySpreadPercentile != null && hySpreadPercentile >= 90 && hySpreadRising) {
     const deepest = zones[zones.length - 1];
     const idx = DEEPER.indexOf(deepest);
     const bumped = DEEPER[Math.min(idx + 1, DEEPER.length - 1)];
     zones = [bumped];
-    note += ` · 하이일드 스프레드 상위 ${Math.round(hySpreadPercentile)}% → 한 칸 보수적`;
+    note += ` · 하이일드 스프레드 상위 ${Math.round(hySpreadPercentile)}% & 상승 중 → 한 칸 보수적`;
   }
-  return { regime: base.regime, activeZones: zones, fng, tenYear, hySpread, hySpreadPercentile, note };
+  return { regime: base.regime, activeZones: zones, fng, tenYear, hySpread, hySpreadPercentile, hySpreadRising, note };
 }

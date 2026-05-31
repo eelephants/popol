@@ -29,6 +29,7 @@ it("combines config + market data into an EnrichedStock", () => {
   expect(s.rsi14).toBe(0);
   expect(s.valuationBadges.per).toBe("fail");
   expect(s.volumeSpike).toBe(2);
+  expect(s.changePct!).toBeCloseTo(((85 - 86) / 86) * 100, 4);
 });
 
 it("uses sheet high override when provided", () => {

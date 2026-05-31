@@ -38,12 +38,13 @@ export type MacroRegime = {
   tenYear: number | null;
   hySpread: number | null;
   hySpreadPercentile: number | null; // 0..100
+  hySpreadRising: boolean;
   note: string;
 };
 
 export type EnrichedStock = {
   ticker: string; name: string;
-  price: number | null; priceKrw: number | null; isStale: boolean;
+  price: number | null; priceKrw: number | null; changePct: number | null; isStale: boolean;
   high: number; highSource: "sheet" | "52w";
   zones: Zone[]; nearestUnreached: NearestZone; drawdownPct: number; zoneStatus: ZoneStatus;
   rsi14: number | null; sma50: number | null; sma200: number | null;

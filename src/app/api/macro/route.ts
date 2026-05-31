@@ -11,7 +11,7 @@ export async function GET() {
     getFearGreed(),
     getUsdKrw(),
   ]);
-  const regime = fg ? macroRegime(fg.score, tenYear, hy?.value ?? null, hy?.percentile1y ?? null) : null;
+  const regime = fg ? macroRegime(fg.score, tenYear, hy?.value ?? null, hy?.percentile1y ?? null, hy?.rising ?? false) : null;
   const data: MacroData = {
     fearGreed: fg,
     tenYearYield: tenYear,

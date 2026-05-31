@@ -15,6 +15,10 @@ export type EnrichInput = {
 
 export function enrichStock(item: WatchlistItem, d: EnrichInput): EnrichedStock {
   const price = d.quote?.price ?? null;
+  const changePct =
+    d.quote && d.quote.previousClose
+      ? ((d.quote.price - d.quote.previousClose) / d.quote.previousClose) * 100
+      : null;
   const high = item.highOverride ?? d.quote?.high52 ?? price ?? 0;
   const highSource: "sheet" | "52w" = item.highOverride != null ? "sheet" : "52w";
 
@@ -29,7 +33,7 @@ export function enrichStock(item: WatchlistItem, d: EnrichInput): EnrichedStock 
 
   return {
     ticker: item.ticker, name: item.name,
-    price, priceKrw: price != null && d.usdKrw != null ? price * d.usdKrw : null, isStale: d.isStale,
+    price, priceKrw: price != null && d.usdKrw != null ? price * d.usdKrw : null, changePct, isStale: d.isStale,
     high, highSource,
     zones, nearestUnreached, zoneStatus,
     drawdownPct: price != null && high > 0 ? drawdownPct(high, price) : 0,
