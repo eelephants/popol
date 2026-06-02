@@ -6,7 +6,7 @@ export async function searchSymbols(query: string): Promise<SymbolMatch[]> {
   for (const base of ["https://query2.finance.yahoo.com", "https://query1.finance.yahoo.com"]) {
     try {
       const url = `${base}/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=8&newsCount=0`;
-      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" }, next: { revalidate: 3600 } });
+      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" }, cache: "no-store" });
       if (!res.ok) continue;
       const json = await res.json();
       const quotes: unknown[] = json?.quotes ?? [];
