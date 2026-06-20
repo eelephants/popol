@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEnrichedStock } from "@/lib/stockData";
-import { POPULAR_TICKERS } from "@/lib/popular";
+import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
+import { KR_STOCKS } from "@/lib/krStocks";
 import { StockAnalysis } from "@/components/StockAnalysis";
 
 type Params = { params: Promise<{ ticker: string }> };
@@ -11,7 +12,10 @@ type Params = { params: Promise<{ ticker: string }> };
 export const dynamic = "force-dynamic";
 
 // Chart meta has no company name; resolve display name for seed tickers.
-const displayName = (t: string) => POPULAR_TICKERS.find((p) => p.ticker === t)?.name;
+const displayName = (t: string) =>
+  POPULAR_TICKERS.find((p) => p.ticker === t)?.name ??
+  POPULAR_KR.find((p) => p.ticker === t)?.name ??
+  KR_STOCKS.find((s) => s.ticker === t)?.krName;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { ticker } = await params;
@@ -20,7 +24,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!stock) {
     return { title: `${t} — 종목을 찾을 수 없음`, robots: { index: false, follow: false } };
   }
-  const price = stock.price != null ? `$${stock.price.toFixed(2)}` : "";
+  const price =
+    stock.price != null
+      ? stock.market === "KR"
+        ? `₩${Math.round(stock.price).toLocaleString()}`
+        : `$${stock.price.toFixed(2)}`
+      : "";
   const rsi = stock.rsi14 != null ? `RSI ${stock.rsi14.toFixed(0)}` : "";
   const cross =
     stock.crossState === "golden" ? "골든크로스" : stock.crossState === "death" ? "데드크로스" : "";
