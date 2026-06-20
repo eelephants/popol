@@ -29,10 +29,13 @@ export async function getFearGreed(): Promise<{ score: number; rating: string } 
   try {
     const res = await fetch("https://production.dataviz.cnn.io/index/fearandgreed/graphdata", {
       headers: {
-        Accept: "application/json",
+        Accept: "application/json, text/plain, */*",
         "Accept-Language": "en-US,en;q=0.9",
-        Referer: "https://www.cnn.com/markets/fear-and-greed",
-        "User-Agent": "Mozilla/5.0",
+        Origin: "https://www.cnn.com",
+        Referer: "https://www.cnn.com/",
+        // CNN blocks generic UAs (HTTP 418); a full browser UA is required.
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       },
       next: { revalidate: 3600 },
     });
