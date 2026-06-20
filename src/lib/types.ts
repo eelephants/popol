@@ -26,6 +26,15 @@ export type ZoneStatus = "in-zone" | "near" | "far" | "unknown";
 
 export type CrossState = "golden" | "death" | "none";
 
+export type MaSignalLevel =
+  | "strong-overheated"
+  | "overheated"
+  | "weak-overheated"
+  | "normal"
+  | "weak-oversold"
+  | "oversold"
+  | "strong-oversold";
+
 export type Valuation = { per: number | null; psr: number | null; pbr: number | null; roe: number | null };
 export type BadgeState = "pass" | "warn" | "fail" | "na";
 export type ValuationBadges = Record<"per" | "psr" | "pbr" | "roe", BadgeState>;

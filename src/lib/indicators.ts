@@ -1,4 +1,4 @@
-import type { CrossState } from "@/lib/types";
+import type { CrossState, MaSignalLevel } from "@/lib/types";
 
 export function sma(closes: number[], period: number): number | null {
   if (closes.length < period || period <= 0) return null;
@@ -67,4 +67,21 @@ export function volumeSpike(todayVolume: number, recentVolumes: number[]): numbe
   const avg = recentVolumes.reduce((a, b) => a + b, 0) / recentVolumes.length;
   if (avg === 0) return null;
   return todayVolume / avg;
+}
+
+/** 이격도(%) = (price − sma) / sma × 100. price/sma가 null이거나 sma가 0이면 null. */
+export function disparity(price: number | null, sma: number | null): number | null {
+  if (price == null || sma == null || sma === 0) return null;
+  return ((price - sma) / sma) * 100;
+}
+
+/** 이격도(%)를 7단계 매매신호 레벨로 매핑. null이면 null. 임계값 ±5/±10/±15(하한 포함). */
+export function maSignal(disparityPct: number | null): MaSignalLevel | null {
+  if (disparityPct == null) return null;
+  const a = Math.abs(disparityPct);
+  if (a < 5) return "normal";
+  const over = disparityPct > 0;
+  if (a < 10) return over ? "weak-overheated" : "weak-oversold";
+  if (a < 15) return over ? "overheated" : "oversold";
+  return over ? "strong-overheated" : "strong-oversold";
 }

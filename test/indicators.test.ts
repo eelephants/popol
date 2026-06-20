@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sma, rsi14, crossState, crossFreshDays, range52w, volumeSpike } from "@/lib/indicators";
+import { sma, rsi14, crossState, crossFreshDays, range52w, volumeSpike, disparity, maSignal } from "@/lib/indicators";
 
 describe("sma", () => {
   it("returns mean of the last `period` closes", () => {
@@ -70,5 +70,54 @@ describe("volumeSpike", () => {
   });
   it("returns null with no history", () => {
     expect(volumeSpike(200, [])).toBeNull();
+  });
+});
+
+describe("disparity", () => {
+  it("is positive when price is above the moving average", () => {
+    expect(disparity(110, 100)).toBeCloseTo(10, 6);
+  });
+  it("is negative when price is below the moving average", () => {
+    expect(disparity(95, 100)).toBeCloseTo(-5, 6);
+  });
+  it("is null when sma is null, zero, or price is null", () => {
+    expect(disparity(100, null)).toBeNull();
+    expect(disparity(100, 0)).toBeNull();
+    expect(disparity(null, 100)).toBeNull();
+  });
+});
+
+describe("maSignal", () => {
+  it("returns null for null input", () => {
+    expect(maSignal(null)).toBeNull();
+  });
+  it("is normal inside ±5%", () => {
+    expect(maSignal(0)).toBe("normal");
+    expect(maSignal(4.9)).toBe("normal");
+    expect(maSignal(-4.9)).toBe("normal");
+  });
+  it("is weak between 5 and 10 (boundary 5 inclusive)", () => {
+    expect(maSignal(5)).toBe("weak-overheated");
+    expect(maSignal(9.9)).toBe("weak-overheated");
+    expect(maSignal(-5)).toBe("weak-oversold");
+    expect(maSignal(-9.9)).toBe("weak-oversold");
+  });
+  it("is mid between 10 and 15 (boundary 10 inclusive)", () => {
+    expect(maSignal(10)).toBe("overheated");
+    expect(maSignal(14.9)).toBe("overheated");
+    expect(maSignal(-10)).toBe("oversold");
+    expect(maSignal(-14.9)).toBe("oversold");
+  });
+  it("is strong at 15 and beyond (boundary 15 inclusive)", () => {
+    expect(maSignal(15)).toBe("strong-overheated");
+    expect(maSignal(30)).toBe("strong-overheated");
+    expect(maSignal(-15)).toBe("strong-oversold");
+    expect(maSignal(-30)).toBe("strong-oversold");
+  });
+  it("matches sheet samples", () => {
+    expect(maSignal(-0.5)).toBe("normal");
+    expect(maSignal(-7.2)).toBe("weak-oversold");
+    expect(maSignal(-19.66)).toBe("strong-oversold");
+    expect(maSignal(20.21)).toBe("strong-overheated");
   });
 });
