@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEnrichedStock } from "@/lib/stockData";
+import { POPULAR_TICKERS } from "@/lib/popular";
 import { StockAnalysis } from "@/components/StockAnalysis";
 
 type Params = { params: Promise<{ ticker: string }> };
@@ -9,10 +10,13 @@ type Params = { params: Promise<{ ticker: string }> };
 // SSR per request — Yahoo data is live (provider uses no-store).
 export const dynamic = "force-dynamic";
 
+// Chart meta has no company name; resolve display name for seed tickers.
+const displayName = (t: string) => POPULAR_TICKERS.find((p) => p.ticker === t)?.name;
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { ticker } = await params;
   const t = decodeURIComponent(ticker).trim().toUpperCase();
-  const stock = await getEnrichedStock(t);
+  const stock = await getEnrichedStock(t, displayName(t));
   if (!stock) {
     return { title: `${t} — 종목을 찾을 수 없음`, robots: { index: false, follow: false } };
   }
@@ -37,7 +41,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function StockPage({ params }: Params) {
   const { ticker } = await params;
   const t = decodeURIComponent(ticker).trim().toUpperCase();
-  const stock = await getEnrichedStock(t);
+  const stock = await getEnrichedStock(t, displayName(t));
   if (!stock) notFound();
 
   return (
