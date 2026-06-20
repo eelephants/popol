@@ -4,7 +4,7 @@ name: CI
 # This never deploys; it just runs tests + build so broken code can't merge.
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
 
 jobs:
