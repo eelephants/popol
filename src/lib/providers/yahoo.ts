@@ -18,7 +18,7 @@ export async function getYahooData(ticker: string): Promise<YahooData | null> {
       const url = `${base}/v8/finance/chart/${encodeURIComponent(ticker)}?range=2y&interval=1d`;
       const res = await fetch(url, {
         headers: { "User-Agent": "Mozilla/5.0" },
-        next: { revalidate: 300 },
+        cache: "no-store", // live price + never cache a transient 429 failure
       });
       if (!res.ok) continue;
       const json = await res.json();
