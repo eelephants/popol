@@ -25,4 +25,10 @@
 ### Env vars (Vercel Project → Settings → Environment Variables) — 모두 선택
 - FINNHUB_API_KEY (optional — valuation badges PER/PSR/PBR/ROE)
 - FRED_API_KEY (optional — 10yr yield / HY spread)
+- GOOGLE_SITE_VERIFICATION (optional — Search Console HTML-tag 인증. URL 접두어 속성 사용; vercel.app 서브도메인은 DNS 인증 불가)
 # 검색·시세·RSI·매수존·환율·공포지수는 키 없이 동작. 구글 시트 더 이상 사용 안 함.
+
+## CI (`.github/workflows/ci.yml`)
+- PR + main/develop push 시 `npm ci → npm test → npm run build` 실행. 품질 게이트 전용 — **배포 안 함**(배포는 Vercel 담당).
+- main·develop 브랜치 보호: `test` 체크 통과해야 머지 가능.
+- 로컬에서 `npm run build` 금지 권장 — 실행 중인 `next dev`의 `.next`를 깨뜨려 dev 서버가 500을 냄. 빌드는 CI가 함.
