@@ -7,9 +7,9 @@ import { MacroDial } from "@/components/MacroDial";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { usSession } from "@/lib/marketHours";
 import Link from "next/link";
-import { POPULAR_TICKERS } from "@/lib/popular";
+import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
 
-const RECENT_KEY = "recent-tickers";
+const recentKey = (m: "US" | "KR") => `recent-tickers-${m.toLowerCase()}`;
 
 export default function Page() {
   const [macro, setMacro] = useState<MacroData | null>(null);
@@ -18,15 +18,21 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [recent, setRecent] = useState<Picked[]>([]);
   const [session, setSession] = useState("");
+  const [market, setMarket] = useState<"US" | "KR">("US");
 
   useEffect(() => {
     fetch("/api/macro").then((r) => r.json()).then(setMacro).catch(() => {});
     setSession(usSession(Date.now()).label);
-    try {
-      const r = localStorage.getItem(RECENT_KEY);
-      if (r) setRecent(JSON.parse(r));
-    } catch {}
   }, []);
+
+  useEffect(() => {
+    try {
+      const r = localStorage.getItem(recentKey(market));
+      setRecent(r ? JSON.parse(r) : []);
+    } catch {
+      setRecent([]);
+    }
+  }, [market]);
 
   const analyze = useCallback(async (p: Picked) => {
     setLoading(true);
@@ -42,7 +48,7 @@ export default function Page() {
         setRecent((prev) => {
           const next = [p, ...prev.filter((x) => x.symbol !== p.symbol)].slice(0, 8);
           try {
-            localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+            localStorage.setItem(recentKey(market), JSON.stringify(next));
           } catch {}
           return next;
         });
@@ -52,7 +58,7 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [market]);
 
   return (
     <main className="mx-auto max-w-md pb-10">
@@ -60,9 +66,22 @@ export default function Page() {
         <h1 className="text-lg font-bold">종목 분석</h1>
         <ThemeToggle />
       </div>
-      {session && <p className="px-4 pb-1 text-xs text-zinc-500">미국장 {session}</p>}
-      <MacroDial macro={macro} />
-      <SearchBox onPick={analyze} />
+      <div className="flex gap-1 px-4 pt-2">
+        {(["US", "KR"] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => { setMarket(m); setStock(null); setError(null); }}
+            className={`rounded-full px-3 py-1 text-sm font-medium ${
+              market === m ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800"
+            }`}
+          >
+            {m === "US" ? "미국장" : "국장"}
+          </button>
+        ))}
+      </div>
+      {market === "US" && session && <p className="px-4 pb-1 text-xs text-zinc-500">미국장 {session}</p>}
+      {market === "US" && <MacroDial macro={macro} />}
+      <SearchBox onPick={analyze} market={market} />
 
       {recent.length > 0 && (
         <div className="flex flex-wrap gap-2 px-3 py-1">
@@ -96,7 +115,7 @@ export default function Page() {
       <nav className="px-3 pt-6" aria-label="인기 종목">
         <div className="mb-2 px-1 text-xs text-zinc-500">인기 종목 바로 분석</div>
         <div className="flex flex-wrap gap-2">
-          {POPULAR_TICKERS.map((p) => (
+          {(market === "US" ? POPULAR_TICKERS : POPULAR_KR).map((p) => (
             <Link
               key={p.ticker}
               href={`/stock/${p.ticker}`}
