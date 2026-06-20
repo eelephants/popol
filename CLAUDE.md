@@ -12,7 +12,7 @@
 - Branch workflow: feature → `develop`(통합) → `develop`→`main` 머지 → `main` 기준 운영배포. 피처를 main에 직접 머지하지 않음.
 - Deploy workflow: auto-deploy on push (main → production, PR → preview)
 - Deploy status command: HTTP health check
-- Merge method: squash
+- Merge method: feature→develop은 squash, develop→main은 merge commit (히스토리 연결 유지 — squash로 하면 두 브랜치가 영구 divergence)
 - Project type: web app (Next.js PWA)
 - Post-deploy health check: {PROD_URL}/api/macro  (키 없이도 200 + usdKrw 반환)
 
