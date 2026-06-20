@@ -15,6 +15,7 @@ export type EnrichInput = {
 
 export function enrichStock(item: WatchlistItem, d: EnrichInput): EnrichedStock {
   const price = d.quote?.price ?? null;
+  const market: "US" | "KR" = d.quote?.currency === "KRW" ? "KR" : "US";
   const changePct =
     d.quote && d.quote.previousClose
       ? ((d.quote.price - d.quote.previousClose) / d.quote.previousClose) * 100
@@ -35,7 +36,8 @@ export function enrichStock(item: WatchlistItem, d: EnrichInput): EnrichedStock 
 
   return {
     ticker: item.ticker, name: item.name,
-    price, priceKrw: price != null && d.usdKrw != null ? price * d.usdKrw : null, changePct, isStale: d.isStale,
+    price, priceKrw: market === "US" && price != null && d.usdKrw != null ? price * d.usdKrw : null, changePct, isStale: d.isStale,
+    market,
     high, highSource,
     zones, nearestUnreached, zoneStatus,
     drawdownPct: price != null && high > 0 ? drawdownPct(high, price) : 0,

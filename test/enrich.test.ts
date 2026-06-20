@@ -12,7 +12,7 @@ const volumes = Array.from({ length: 250 }, () => 1000);
 
 it("combines config + market data into an EnrichedStock", () => {
   const s = enrichStock(item, {
-    quote: { price: 85, previousClose: 86, volume: 2000, high52: 100, low52: 70, marketTime: Date.now() },
+    quote: { price: 85, previousClose: 86, volume: 2000, high52: 100, low52: 70, marketTime: Date.now(), currency: "USD" },
     history: { closes, volumes },
     valuation: { per: 30, psr: 20, pbr: 40, roe: 90 },
     usdKrw: 1500,
@@ -35,12 +35,14 @@ it("combines config + market data into an EnrichedStock", () => {
   expect(s.disparity200).not.toBeNull();
   expect(s.disparity200!).toBeLessThan(0);
   expect(s.signal50).not.toBeNull();
+  expect(s.market).toBe("US");
+  expect(s.priceKrw).toBe(85 * 1500);
 });
 
 it("uses sheet high override when provided", () => {
   const s = enrichStock(
     { ...item, highOverride: 120 },
-    { quote: { price: 85, previousClose: 86, volume: 1000, high52: 100, low52: 70, marketTime: 0 },
+    { quote: { price: 85, previousClose: 86, volume: 1000, high52: 100, low52: 70, marketTime: 0, currency: "USD" },
       history: null, valuation: { per: null, psr: null, pbr: null, roe: null },
       usdKrw: null, thresholds: DEFAULT_THRESHOLDS, isStale: false },
   );
@@ -50,4 +52,18 @@ it("uses sheet high override when provided", () => {
   expect(s.priceKrw).toBeNull();
   expect(s.disparity50).toBeNull();
   expect(s.signal50).toBeNull();
+});
+
+it("treats KRW-currency quotes as KR market with no won conversion", () => {
+  const krCloses = Array.from({ length: 250 }, (_, i) => 70000 + i * 10);
+  const s = enrichStock(
+    { ticker: "005930.KS", name: "삼성전자", buyThesis: "", sellRisk: "", theme: { aiInfra: false, trump: false, tariff: false }, highOverride: null },
+    { quote: { price: 75000, previousClose: 74000, volume: 1000, high52: 90000, low52: 60000, marketTime: 0, currency: "KRW" },
+      history: { closes: krCloses, volumes: krCloses.map(() => 1000) },
+      valuation: { per: null, psr: null, pbr: null, roe: null },
+      usdKrw: 1500, thresholds: DEFAULT_THRESHOLDS, isStale: false },
+  );
+  expect(s.market).toBe("KR");
+  expect(s.priceKrw).toBeNull();
+  expect(s.price).toBe(75000);
 });

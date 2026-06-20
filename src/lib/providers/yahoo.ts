@@ -1,6 +1,7 @@
 export type Quote = {
   price: number; previousClose: number; volume: number;
   high52: number; low52: number; marketTime: number;
+  currency: string;
 };
 export type DailyHistory = { closes: number[]; volumes: number[] };
 export type YahooData = { quote: Quote; history: DailyHistory };
@@ -43,6 +44,7 @@ export async function getYahooData(ticker: string): Promise<YahooData | null> {
         high52: meta.fiftyTwoWeekHigh ?? (closes.length ? Math.max(...closes.slice(-252), price) : price),
         low52: meta.fiftyTwoWeekLow ?? (closes.length ? Math.min(...closes.slice(-252), price) : price),
         marketTime: meta.regularMarketTime ? meta.regularMarketTime * 1000 : Date.now(),
+        currency: meta.currency ?? "USD",
       };
       return { quote, history: { closes, volumes } };
     } catch {
