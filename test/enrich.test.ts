@@ -30,6 +30,11 @@ it("combines config + market data into an EnrichedStock", () => {
   expect(s.valuationBadges.per).toBe("fail");
   expect(s.volumeSpike).toBe(2);
   expect(s.changePct!).toBeCloseTo(((85 - 86) / 86) * 100, 4);
+  expect(s.disparity50).not.toBeNull();
+  expect(s.disparity50!).toBeLessThan(0);
+  expect(s.disparity200).not.toBeNull();
+  expect(s.disparity200!).toBeLessThan(0);
+  expect(s.signal50).not.toBeNull();
 });
 
 it("uses sheet high override when provided", () => {
@@ -43,4 +48,6 @@ it("uses sheet high override when provided", () => {
   expect(s.highSource).toBe("sheet");
   expect(s.rsi14).toBeNull();
   expect(s.priceKrw).toBeNull();
+  expect(s.disparity50).toBeNull();
+  expect(s.signal50).toBeNull();
 });

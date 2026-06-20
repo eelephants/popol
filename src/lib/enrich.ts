@@ -1,6 +1,6 @@
 import type { EnrichedStock, WatchlistItem, Valuation, ValuationThresholds } from "@/lib/types";
 import type { Quote, DailyHistory } from "@/lib/providers/yahoo";
-import { rsi14, sma, crossState, crossFreshDays, range52w, volumeSpike } from "@/lib/indicators";
+import { rsi14, sma, crossState, crossFreshDays, range52w, volumeSpike, disparity, maSignal } from "@/lib/indicators";
 import { buildZones, nearestUnreachedZone, zoneStatusOf, drawdownPct } from "@/lib/buyzones";
 import { themeScore, valuationBadges } from "@/lib/scoring";
 
@@ -30,6 +30,8 @@ export function enrichStock(item: WatchlistItem, d: EnrichInput): EnrichedStock 
   const volumes = d.history?.volumes ?? [];
   const sma50 = sma(closes, 50);
   const sma200 = sma(closes, 200);
+  const disparity50 = disparity(price, sma50);
+  const disparity200 = disparity(price, sma200);
 
   return {
     ticker: item.ticker, name: item.name,
@@ -41,6 +43,8 @@ export function enrichStock(item: WatchlistItem, d: EnrichInput): EnrichedStock 
     sma50, sma200,
     crossState: crossState(sma50, sma200),
     crossFreshDays: closes.length >= 200 ? crossFreshDays(closes) : null,
+    disparity50, disparity200,
+    signal50: maSignal(disparity50), signal200: maSignal(disparity200),
     range52wPct: d.quote ? range52w(d.quote.price, d.quote.low52, d.quote.high52) : null,
     volumeSpike: d.quote && volumes.length > 1 ? volumeSpike(d.quote.volume, volumes.slice(-21, -1)) : null,
     valuation: d.valuation,

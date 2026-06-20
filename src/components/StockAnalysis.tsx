@@ -1,7 +1,39 @@
-import type { EnrichedStock } from "@/lib/types";
+import type { EnrichedStock, MaSignalLevel } from "@/lib/types";
 import { BuyZoneLadder } from "./BuyZoneLadder";
 import { RsiGauge } from "./RsiGauge";
 import { ValuationBadges } from "./ValuationBadges";
+
+const SIGNAL_DISPLAY: Record<MaSignalLevel, { emoji: string; label: string; className: string }> = {
+  "strong-overheated": { emoji: "🔴", label: "강과열 · 매도 고려", className: "text-red-500" },
+  "overheated": { emoji: "🟠", label: "과열", className: "text-orange-500" },
+  "weak-overheated": { emoji: "🟡", label: "약과열", className: "text-amber-500" },
+  "normal": { emoji: "🟢", label: "정상", className: "text-green-600" },
+  "weak-oversold": { emoji: "🟡", label: "약과매도", className: "text-amber-500" },
+  "oversold": { emoji: "🟠", label: "과매도", className: "text-orange-500" },
+  "strong-oversold": { emoji: "🔴", label: "강과매도 · 매수 고려", className: "text-red-500" },
+};
+
+function SignalRow({
+  label, sma, disparity, signal,
+}: {
+  label: string; sma: number | null; disparity: number | null; signal: MaSignalLevel | null;
+}) {
+  if (sma == null) return null;
+  const sig = signal ? SIGNAL_DISPLAY[signal] : null;
+  return (
+    <div className="flex flex-wrap items-center gap-x-1.5 text-zinc-500">
+      <span>{label}</span>
+      <span className="tabular-nums">{sma.toFixed(2)}</span>
+      {disparity != null && (
+        <span className="tabular-nums">
+          {disparity >= 0 ? "+" : ""}
+          {disparity.toFixed(2)}%
+        </span>
+      )}
+      {sig && <span className={`font-medium ${sig.className}`}>{sig.emoji} {sig.label}</span>}
+    </div>
+  );
+}
 
 function zoneChip(stock: EnrichedStock): string {
   const reached = stock.zones.filter((z) => z.reached);
@@ -53,9 +85,8 @@ export function StockAnalysis({ stock }: { stock: EnrichedStock }) {
             {stock.crossState === "golden" ? "골든크로스 영역" : stock.crossState === "death" ? "데드크로스 영역" : "—"}
             {stock.crossFreshDays != null && ` (${stock.crossFreshDays}일 전 교차)`}
           </div>
-          {stock.sma50 != null && stock.sma200 != null && (
-            <div className="text-zinc-500">50일 {stock.sma50.toFixed(1)} / 200일 {stock.sma200.toFixed(1)}</div>
-          )}
+          <SignalRow label="단기(50일)" sma={stock.sma50} disparity={stock.disparity50} signal={stock.signal50} />
+          <SignalRow label="장기(200일)" sma={stock.sma200} disparity={stock.disparity200} signal={stock.signal200} />
           {stock.range52wPct != null && <div className="text-zinc-500">52주 위치 {stock.range52wPct.toFixed(0)}%</div>}
           {stock.volumeSpike != null && (
             <div className={stock.volumeSpike >= 1.5 ? "text-amber-600" : "text-zinc-500"}>거래량 {stock.volumeSpike.toFixed(1)}배</div>
