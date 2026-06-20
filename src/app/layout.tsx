@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
+  // Set GOOGLE_SITE_VERIFICATION in Vercel env to emit the Search Console tag.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
+  // og:image / twitter image come from app/opengraph-image.tsx (file convention).
   openGraph: {
     type: "website",
     locale: "ko_KR",
@@ -22,13 +27,11 @@ export const metadata: Metadata = {
     siteName: "관심종목",
     title: TITLE,
     description: DESCRIPTION,
-    images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: "관심종목" }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/icons/icon-512.png"],
   },
   icons: {
     icon: [
