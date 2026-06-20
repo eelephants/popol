@@ -58,6 +58,8 @@ export type EnrichedStock = {
   zones: Zone[]; nearestUnreached: NearestZone; drawdownPct: number; zoneStatus: ZoneStatus;
   rsi14: number | null; sma50: number | null; sma200: number | null;
   crossState: CrossState; crossFreshDays: number | null;
+  disparity50: number | null; disparity200: number | null;
+  signal50: MaSignalLevel | null; signal200: MaSignalLevel | null;
   range52wPct: number | null; volumeSpike: number | null;
   valuation: Valuation; valuationBadges: ValuationBadges;
   buyThesis: string; sellRisk: string; theme: ThemeFlags; score: Score;
