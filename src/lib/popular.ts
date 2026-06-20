@@ -14,3 +14,14 @@ export const POPULAR_TICKERS: { ticker: string; name: string }[] = [
   { ticker: "JPM", name: "JPMorgan" },
   { ticker: "V", name: "Visa" },
 ];
+
+export const POPULAR_KR = [
+  { ticker: "005930.KS", name: "삼성전자" },
+  { ticker: "000660.KS", name: "SK하이닉스" },
+  { ticker: "373220.KS", name: "LG에너지솔루션" },
+  { ticker: "035420.KS", name: "NAVER" },
+  { ticker: "035720.KS", name: "카카오" },
+  { ticker: "005380.KS", name: "현대차" },
+  { ticker: "247540.KQ", name: "에코프로비엠" },
+  { ticker: "068270.KS", name: "셀트리온" },
+];

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 export type Picked = { symbol: string; name: string };
 
-export function SearchBox({ onPick }: { onPick: (p: Picked) => void }) {
+export function SearchBox({ onPick, market }: { onPick: (p: Picked) => void; market: "US" | "KR" }) {
   const [q, setQ] = useState("");
   const [matches, setMatches] = useState<{ symbol: string; name: string; exchange: string }[]>([]);
   const [open, setOpen] = useState(false);
@@ -20,7 +20,7 @@ export function SearchBox({ onPick }: { onPick: (p: Picked) => void }) {
     timer.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const r = await fetch(`/api/search?q=${encodeURIComponent(term)}`);
+        const r = await fetch(`/api/search?q=${encodeURIComponent(term)}&market=${market}`);
         const j = await r.json();
         setMatches(j.matches ?? []);
         setOpen(true);
@@ -33,7 +33,7 @@ export function SearchBox({ onPick }: { onPick: (p: Picked) => void }) {
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [q]);
+  }, [q, market]);
 
   const pick = (symbol: string, name: string) => {
     setOpen(false);
@@ -56,7 +56,7 @@ export function SearchBox({ onPick }: { onPick: (p: Picked) => void }) {
         onChange={(e) => setQ(e.target.value)}
         onKeyDown={onKeyDown}
         onFocus={() => matches.length > 0 && setOpen(true)}
-        placeholder="종목 검색 (예: AAPL, tesla, NVDA)"
+        placeholder={market === "KR" ? "종목 검색 (예: 삼성전자, 005930, SK하이닉스)" : "종목 검색 (예: AAPL, tesla, NVDA)"}
         className="w-full rounded-xl border border-zinc-300 bg-transparent px-4 py-3 text-base outline-none focus:border-zinc-500 dark:border-zinc-700"
         autoComplete="off"
       />

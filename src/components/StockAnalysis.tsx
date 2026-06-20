@@ -59,14 +59,18 @@ export function StockAnalysis({ stock }: { stock: EnrichedStock }) {
           </h2>
           {stock.price != null && (
             <p className="mt-0.5">
-              <span className="text-lg font-semibold tabular-nums">${stock.price.toFixed(2)}</span>
+              {stock.market === "KR" ? (
+                <span className="text-lg font-semibold tabular-nums">₩{Math.round(stock.price).toLocaleString()}</span>
+              ) : (
+                <span className="text-lg font-semibold tabular-nums">${stock.price.toFixed(2)}</span>
+              )}
               {stock.changePct != null && (
                 <span className={`ml-2 text-sm ${stock.changePct >= 0 ? "text-green-600" : "text-red-500"}`}>
                   {stock.changePct >= 0 ? "+" : ""}
                   {stock.changePct.toFixed(2)}%
                 </span>
               )}
-              {stock.priceKrw != null && (
+              {stock.market === "US" && stock.priceKrw != null && (
                 <span className="ml-2 text-sm text-zinc-500">₩{Math.round(stock.priceKrw).toLocaleString()}</span>
               )}
             </p>
@@ -94,7 +98,7 @@ export function StockAnalysis({ stock }: { stock: EnrichedStock }) {
         </div>
       </div>
 
-      <ValuationBadges stock={stock} />
+      {stock.market === "US" && <ValuationBadges stock={stock} />}
     </div>
   );
 }

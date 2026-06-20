@@ -1,8 +1,14 @@
+import { resolveKrName } from "@/lib/krStocks";
+
 export type SymbolMatch = { symbol: string; name: string; exchange: string };
 
-export async function searchSymbols(query: string): Promise<SymbolMatch[]> {
-  const q = query.trim();
-  if (!q) return [];
+const isKrSymbol = (s: string) => /\.(KS|KQ)$/i.test(s);
+
+export function filterByMarket(matches: SymbolMatch[], market: "US" | "KR"): SymbolMatch[] {
+  return matches.filter((m) => (market === "KR" ? isKrSymbol(m.symbol) : !isKrSymbol(m.symbol)));
+}
+
+async function fetchYahoo(q: string): Promise<SymbolMatch[]> {
   for (const base of ["https://query2.finance.yahoo.com", "https://query1.finance.yahoo.com"]) {
     try {
       const url = `${base}/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=8&newsCount=0`;
@@ -20,4 +26,16 @@ export async function searchSymbols(query: string): Promise<SymbolMatch[]> {
     }
   }
   return [];
+}
+
+export async function searchSymbols(query: string, market: "US" | "KR" = "US"): Promise<SymbolMatch[]> {
+  const q = query.trim();
+  if (!q) return [];
+  const yahoo = filterByMarket(await fetchYahoo(q), market);
+  if (market === "KR") {
+    const mapped = resolveKrName(q);
+    const seen = new Set(mapped.map((m) => m.symbol));
+    return [...mapped, ...yahoo.filter((m) => !seen.has(m.symbol))].slice(0, 8);
+  }
+  return yahoo;
 }

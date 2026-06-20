@@ -13,9 +13,10 @@ export const getEnrichedStock = cache(
     const ticker = rawTicker.trim().toUpperCase();
     if (!ticker) return null;
     const finnhubKey = process.env.FINNHUB_API_KEY ?? "";
+    const isKr = /\.(KS|KQ)$/i.test(ticker);
     const [yahoo, valuation, usdKrw] = await Promise.all([
       getYahooData(ticker),
-      getValuation(ticker, finnhubKey),
+      isKr ? Promise.resolve({ per: null, psr: null, pbr: null, roe: null }) : getValuation(ticker, finnhubKey),
       getUsdKrw(),
     ]);
     if (!yahoo) return null;
