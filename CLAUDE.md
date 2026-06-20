@@ -9,6 +9,7 @@
 ## Deploy Configuration (configured by /setup-deploy)
 - Platform: Vercel
 - Production URL: https://popol-topaz.vercel.app
+- Branch workflow: feature → `develop`(통합) → `develop`→`main` 머지 → `main` 기준 운영배포. 피처를 main에 직접 머지하지 않음.
 - Deploy workflow: auto-deploy on push (main → production, PR → preview)
 - Deploy status command: HTTP health check
 - Merge method: squash
