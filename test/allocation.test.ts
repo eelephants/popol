@@ -1,17 +1,25 @@
 import { describe, it, expect } from "vitest";
-import { allocate, toKrw, formatMoney, convertAmount, type AllocRow } from "@/lib/allocation";
+import { allocate, toKrw, formatMoney, convertAmount, formatShares, type AllocRow } from "@/lib/allocation";
 
 const row = (over: Partial<AllocRow> = {}): AllocRow => ({
   symbol: "AAPL", name: "Apple", pct: 60, priceKrw: 100_000, ...over,
 });
 
 describe("allocate", () => {
-  it("splits the total by percent and floors the share count", () => {
+  it("splits the total by percent and allows fractional shares", () => {
     const a = allocate(10_000_000, [row({ pct: 33, priceKrw: 400_000 })]);
     expect(a.rows[0].amountKrw).toBe(3_300_000);
-    expect(a.rows[0].shares).toBe(8); // 8.25 → 내림
-    expect(a.rows[0].filledKrw).toBe(3_200_000);
-    expect(a.rows[0].leftoverKrw).toBe(100_000);
+    expect(a.rows[0].shares).toBe(8.25); // 소수점 매수 — 8주로 내리지 않는다
+    expect(a.rows[0].filledKrw).toBe(3_300_000);
+    expect(a.rows[0].leftoverKrw).toBe(0);
+  });
+
+  it("floors the share count at 6 decimals, the broker limit", () => {
+    const a = allocate(50_000_000, [row({ pct: 33.3, priceKrw: 448_405.62 })]);
+    expect(a.rows[0].amountKrw).toBe(16_650_000);
+    expect(a.rows[0].shares).toBe(37.131559); // 37.1315596… → 내림
+    expect(a.rows[0].leftoverKrw).toBeGreaterThan(0);
+    expect(a.rows[0].leftoverKrw).toBeLessThan(1); // 남는 건 1원 미만
   });
 
   it("reports the unallocated remainder as cash when percents sum under 100", () => {
@@ -30,11 +38,11 @@ describe("allocate", () => {
     expect(a.cashKrw).toBe(0);
   });
 
-  it("yields zero shares when one share costs more than the allocated amount", () => {
+  it("buys a part of a share when one share costs more than the allocated amount", () => {
     const a = allocate(1_000_000, [row({ pct: 10, priceKrw: 500_000 })]);
-    expect(a.rows[0].shares).toBe(0);
-    expect(a.rows[0].filledKrw).toBe(0);
-    expect(a.rows[0].leftoverKrw).toBe(100_000);
+    expect(a.rows[0].shares).toBe(0.2);
+    expect(a.rows[0].filledKrw).toBe(100_000);
+    expect(a.rows[0].leftoverKrw).toBe(0);
   });
 
   it("leaves share math null when the price is unavailable (FX lookup failed)", () => {
@@ -46,11 +54,11 @@ describe("allocate", () => {
   });
 
   it("excludes priceless rows from the leftover total instead of counting them as zero", () => {
-    const a = allocate(10_000_000, [
-      row({ pct: 33, priceKrw: 400_000 }), // leftover 100,000
+    const a = allocate(50_000_000, [
+      row({ pct: 33.3, priceKrw: 448_405.62 }),
       row({ symbol: "MSFT", pct: 10, priceKrw: null }),
     ]);
-    expect(a.leftoverKrw).toBe(100_000);
+    expect(a.leftoverKrw).toBe(a.rows[0].leftoverKrw);
   });
 
   it("returns zeroed rows for a zero or negative total", () => {
@@ -115,5 +123,21 @@ describe("convertAmount", () => {
 
   it("returns the amount untouched when no rate is available", () => {
     expect(convertAmount(50_000_000, "KRW", "USD", null)).toBe(50_000_000);
+  });
+});
+
+describe("formatShares", () => {
+  it("shows fractional shares to the broker's 6 decimals", () => {
+    expect(formatShares(37.131559)).toBe("37.131559");
+    expect(formatShares(8.25)).toBe("8.25");
+    expect(formatShares(0.2)).toBe("0.2");
+  });
+
+  it("drops the decimal point for whole shares", () => {
+    expect(formatShares(135)).toBe("135");
+  });
+
+  it("groups thousands", () => {
+    expect(formatShares(1234.5)).toBe("1,234.5");
   });
 });
