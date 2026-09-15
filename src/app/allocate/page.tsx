@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SearchBox, type Picked } from "@/components/SearchBox";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { allocate, toKrw, formatMoney, convertAmount, type Currency } from "@/lib/allocation";
+import { allocate, toKrw, formatMoney, convertAmount, formatShares, type Currency } from "@/lib/allocation";
 
 type Row = {
   symbol: string;
@@ -207,7 +207,7 @@ export default function AllocatePage() {
         <p className="px-4 py-10 text-center text-sm text-zinc-400">
           총 자산을 넣고 종목을 검색해 추가하세요.
           <br />
-          비율대로 배분 금액과 매수 가능 주수를 계산합니다.
+          비율대로 배분 금액과 매수 주수(소수점 매수 기준)를 계산합니다.
         </p>
       )}
 
@@ -252,11 +252,12 @@ export default function AllocatePage() {
                 <span className="font-semibold">{money(r.amountKrw)}</span>
                 {r.shares != null ? (
                   <>
-                    <span className="text-zinc-500">
-                      {r.shares.toLocaleString("ko-KR")}주 · 체결 {money(r.filledKrw ?? 0)}
-                    </span>
-                    {(r.leftoverKrw ?? 0) > 0 && (
-                      <span className="text-xs text-zinc-400">잔액 {money(r.leftoverKrw ?? 0)}</span>
+                    <span className="text-zinc-500">{formatShares(r.shares)}주</span>
+                    {/* 소수점 매수라 체결금액은 배분금액과 거의 같다 — 차이가 1원 이상일 때만 보여준다 */}
+                    {(r.leftoverKrw ?? 0) >= 1 && (
+                      <span className="text-xs text-zinc-400">
+                        체결 {money(r.filledKrw ?? 0)} · 잔액 {money(r.leftoverKrw ?? 0)}
+                      </span>
                     )}
                   </>
                 ) : (
@@ -286,7 +287,7 @@ export default function AllocatePage() {
               <span>{money(alloc.cashKrw)}</span>
             </div>
           )}
-          {alloc.leftoverKrw > 0 && (
+          {alloc.leftoverKrw >= 1 && (
             <div className="flex justify-between pt-1 text-xs text-zinc-400">
               <span>단수 잔액 합</span>
               <span>{money(alloc.leftoverKrw)}</span>
