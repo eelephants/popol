@@ -5,6 +5,7 @@
 - 스택: Next.js 15 (App Router) · TypeScript · Tailwind · Vitest
 - 데이터: Yahoo v8 chart · Finnhub · FRED · CNN F&G · frankfurter
 - 외부 호출은 전부 서버 라우트(`/api/*`)에서만 (키 은닉 + 캐싱)
+- 페이지: `/` 종목 분석 · `/allocate` 자산 분배(총자산·비율 → 배분금액·매수 가능 주수). 하단 탭바(`src/components/NavBar.tsx`, layout에 상주)로 이동. 분배 계산은 원화 정본 + 표시 통화(₩/$) 토글 — 미국 종목은 `EnrichedStock.priceKrw`(= price × usdKrw)를 원화 단가로 쓰므로 환율 코드가 따로 없음.
 - 시장 구분: Yahoo `meta.currency === "KRW"` → 국장(KR). 국장은 ₩ 표시·환율변환 없음·공포지수/금리/환율 카드 숨김·Finnhub 밸류에이션 스킵. `/stock/[ticker]` 직접 진입도 동일. 한글명 검색은 `src/lib/krStocks.ts` 매핑(주요 종목, Yahoo 검색은 한글 0건이라 필요). 계산(RSI·이평선·이격도)은 시장 무관.
 
 ## Deploy Configuration (configured by /setup-deploy)
