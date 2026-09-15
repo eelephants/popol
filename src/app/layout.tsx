@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { NavBar } from "@/components/NavBar";
 
 const SITE_URL = "https://popol-topaz.vercel.app";
 const TITLE = "관심종목 · 미국 주식 RSI·매수존 자동 분석";
@@ -58,7 +59,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);}catch(e){}})();`,
           }}
         />
-        {children}
+        <div className="pb-16">{children}</div>
+        <NavBar />
         <script
           dangerouslySetInnerHTML={{
             __html: `if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}))}`,
