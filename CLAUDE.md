@@ -7,6 +7,7 @@
 - 외부 호출은 전부 서버 라우트(`/api/*`)에서만 (키 은닉 + 캐싱)
 - 페이지: `/` 종목 분석 · `/allocate` 자산 분배(총자산·비율 → 배분금액·매수 주수, 소수점 6자리 매수 기준). 하단 탭바(`src/components/NavBar.tsx`, layout에 상주)로 이동. 분배 계산은 원화 정본 + 표시 통화(₩/$) 토글 — 미국 종목은 `EnrichedStock.priceKrw`(= price × usdKrw)를 원화 단가로 쓰므로 환율 코드가 따로 없음.
 - 시장 구분: Yahoo `meta.currency === "KRW"` → 국장(KR). 국장은 ₩ 표시·환율변환 없음·공포지수/금리/환율 카드 숨김·Finnhub 밸류에이션 스킵. `/stock/[ticker]` 직접 진입도 동일. 한글명 검색은 `src/lib/krStocks.ts` 매핑(주요 종목, Yahoo 검색은 한글 0건이라 필요). 계산(RSI·이평선·이격도)은 시장 무관.
+- SEO: 공용 상수·OpenGraph 규칙은 `src/lib/site.ts` 주석 참고(SITE_URL/OG_BASE/OG_IMAGE). 라우트별 metadata가 필요한 클라이언트 페이지는 서버 `layout.tsx`로 분리(`/allocate/layout.tsx`). 사이트맵 종목은 `src/lib/popular.ts`의 `SEED_TICKERS`.
 
 ## Deploy Configuration (configured by /setup-deploy)
 - Platform: Vercel
@@ -28,6 +29,7 @@
 - FINNHUB_API_KEY (optional — valuation badges PER/PSR/PBR/ROE; 국장 종목에는 호출 안 함)
 - FRED_API_KEY (optional — 10yr yield / HY spread)
 - GOOGLE_SITE_VERIFICATION (optional — Search Console HTML-tag 인증. URL 접두어 속성 사용; vercel.app 서브도메인은 DNS 인증 불가)
+- NAVER_SITE_VERIFICATION (optional — 네이버 서치어드바이저 HTML-tag 인증. 빌드 시 읽으므로 설정 후 재배포 필요)
 # 검색·시세·RSI·매수존·환율·공포지수는 키 없이 동작. 구글 시트 더 이상 사용 안 함.
 
 ## CI (`.github/workflows/ci.yml`)
