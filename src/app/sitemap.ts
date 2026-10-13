@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
-import { POPULAR_TICKERS } from "@/lib/popular";
-
-const SITE_URL = "https://popol-topaz.vercel.app";
+import { SEED_TICKERS } from "@/lib/popular";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
-    ...POPULAR_TICKERS.map((p) => ({
+    { url: `${SITE_URL}/allocate`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    ...SEED_TICKERS.map((p) => ({
       url: `${SITE_URL}/stock/${p.ticker}`,
       lastModified: now,
       changeFrequency: "daily" as const,
