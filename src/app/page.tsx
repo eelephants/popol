@@ -6,7 +6,7 @@ import { StockAnalysis } from "@/components/StockAnalysis";
 import { MacroDial } from "@/components/MacroDial";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { usSession } from "@/lib/marketHours";
-import Link from "next/link";
+import { TickerChips } from "@/components/TickerChips";
 import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
 
 const recentKey = (m: "US" | "KR") => `recent-tickers-${m.toLowerCase()}`;
@@ -112,21 +112,7 @@ export default function Page() {
         </p>
       )}
 
-      <nav className="px-3 pt-6" aria-label="인기 종목">
-        <div className="mb-2 px-1 text-xs text-zinc-500">인기 종목 바로 분석</div>
-        <div className="flex flex-wrap gap-2">
-          {(market === "US" ? POPULAR_TICKERS : POPULAR_KR).map((p) => (
-            <Link
-              key={p.ticker}
-              href={`/stock/${p.ticker}`}
-              prefetch={false}
-              className="rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-600 hover:border-zinc-400 dark:border-zinc-800 dark:text-zinc-300"
-            >
-              {p.ticker} <span className="text-zinc-400">{p.name}</span>
-            </Link>
-          ))}
-        </div>
-      </nav>
+      <TickerChips label="인기 종목 바로 분석" items={market === "US" ? POPULAR_TICKERS : POPULAR_KR} />
     </main>
   );
 }
