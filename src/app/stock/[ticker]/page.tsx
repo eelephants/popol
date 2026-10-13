@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEnrichedStock } from "@/lib/stockData";
-import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
+import { POPULAR_TICKERS, POPULAR_KR, SEED_TICKERS } from "@/lib/popular";
 import { KR_STOCKS } from "@/lib/krStocks";
 import { StockAnalysis } from "@/components/StockAnalysis";
+import { TickerChips } from "@/components/TickerChips";
+import { OG_BASE, OG_IMAGE } from "@/lib/site";
 
 type Params = { params: Promise<{ ticker: string }> };
 
@@ -13,13 +15,14 @@ export const dynamic = "force-dynamic";
 
 // Chart meta has no company name; resolve display name for seed tickers.
 const displayName = (t: string) =>
-  POPULAR_TICKERS.find((p) => p.ticker === t)?.name ??
-  POPULAR_KR.find((p) => p.ticker === t)?.name ??
+  SEED_TICKERS.find((p) => p.ticker === t)?.name ??
   KR_STOCKS.find((s) => s.ticker === t)?.krName;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { ticker } = await params;
   const t = decodeURIComponent(ticker).trim().toUpperCase();
+  // Yahoo outages throw → 500 (crawler retries); only a real unknown ticker is null → 404.
+  // ponytail: the 500 relies on no loading.tsx/Suspense above this page — adding one turns it into a streamed 200.
   const stock = await getEnrichedStock(t, displayName(t));
   if (!stock) {
     return { title: `${t} — 종목을 찾을 수 없음`, robots: { index: false, follow: false } };
@@ -42,8 +45,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: url },
-    openGraph: { type: "website", url, title, description, locale: "ko_KR", siteName: "관심종목" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { ...OG_BASE, url, title, description, images: OG_IMAGE },
+    twitter: { card: "summary_large_image" },
   };
 }
 
@@ -52,6 +55,7 @@ export default async function StockPage({ params }: Params) {
   const t = decodeURIComponent(ticker).trim().toUpperCase();
   const stock = await getEnrichedStock(t, displayName(t));
   if (!stock) notFound();
+  const others = (stock.market === "KR" ? POPULAR_KR : POPULAR_TICKERS).filter((p) => p.ticker !== t);
 
   return (
     <main className="mx-auto max-w-md pb-10">
@@ -66,6 +70,7 @@ export default async function StockPage({ params }: Params) {
         RSI·이동평균(50/200)·매수존(-10~-25%)·밸류에이션을 실시간 무료 데이터로 자동 계산합니다.
         계산 공식은 모든 종목에 동일하게 적용됩니다.
       </p>
+      <TickerChips label="다른 종목 분석" items={others} />
     </main>
   );
 }

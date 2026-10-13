@@ -25,3 +25,6 @@ export const POPULAR_KR = [
   { ticker: "247540.KQ", name: "에코프로비엠" },
   { ticker: "068270.KS", name: "셀트리온" },
 ];
+
+/** Both markets — the sitemap / crawlable-link set. */
+export const SEED_TICKERS = [...POPULAR_TICKERS, ...POPULAR_KR];

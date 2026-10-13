@@ -1,12 +1,13 @@
 import { ImageResponse } from "next/og";
+import { SITE_URL, OG_IMAGE } from "@/lib/site";
 
 export const runtime = "nodejs";
-export const alt = "관심종목 — 미국 주식 RSI·매수존 자동 분석";
+export const alt = OG_IMAGE.alt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const TITLE_KO = "관심종목";
-const SUB_KO = "미국 주식 RSI · 매수존 · 밸류에이션 자동 분석";
+const SUB_KO = "미국·한국 주식 RSI · 매수존 · 밸류에이션 자동 분석";
 
 /** Fetch a tiny Noto Sans KR subset (only the glyphs we render).
  *  Returns undefined on failure → image still renders (Latin fallback). */
@@ -50,7 +51,7 @@ function Card({ ko }: { ko: boolean }) {
         {ko ? TITLE_KO : "popol"}
       </div>
       <div style={{ marginTop: 12, fontSize: 40, color: "#a1a1aa" }}>
-        {ko ? SUB_KO : "US Stock Analyzer · RSI · Buy Zone · Valuation"}
+        {ko ? SUB_KO : "US · KR Stock Analyzer · RSI · Buy Zone · Valuation"}
       </div>
       <div style={{ marginTop: 56, display: "flex", gap: 16 }}>
         {["RSI 14", "MA 50 / 200", "BUY ZONE -10~-25%"].map((t) => (
@@ -68,7 +69,7 @@ function Card({ ko }: { ko: boolean }) {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 64, fontSize: 28, color: "#52525b" }}>popol-topaz.vercel.app</div>
+      <div style={{ marginTop: 64, fontSize: 28, color: "#52525b" }}>{new URL(SITE_URL).host}</div>
     </div>
   );
 }
