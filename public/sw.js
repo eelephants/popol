@@ -1,4 +1,4 @@
-const CACHE = "popol-v2";
+const CACHE = "popol-v3";
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/"])));
   self.skipWaiting();
@@ -8,7 +8,8 @@ self.addEventListener("activate", (e) => {
 });
 self.addEventListener("fetch", (e) => {
   const { request } = e;
-  if (request.method !== "GET") return;
+  // 같은 출처 GET만 다룬다. 광고·외부 스크립트까지 캐시하면 저장소가 불어나고 오프라인 때 낡은 광고 코드가 나간다.
+  if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
   e.respondWith(
     fetch(request)
       .then((res) => {
