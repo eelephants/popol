@@ -14,8 +14,8 @@ export function ScorePill({ score }: { score: ReaderScore | null }) {
   );
 }
 
-/** 엑셀의 구간표. 라벨 아랫줄의 "구간표" 토글로 연다. */
-export function useBandTable(table: { range: string; score: ReaderScore }[]) {
+/** 쉬운 설명 + 점수 구간표. 라벨 아랫줄의 "설명" 토글로 연다. */
+export function useExplain(help: string, table: { range: string; score: ReaderScore }[]) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const toggle = (
@@ -26,20 +26,24 @@ export function useBandTable(table: { range: string; score: ReaderScore }[]) {
       onClick={() => setOpen((o) => !o)}
       className="whitespace-nowrap text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
     >
-      구간표 <span aria-hidden className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}>›</span>
+      설명 <span aria-hidden className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}>›</span>
     </button>
   );
   const body = open ? (
-    <table id={id} className="mt-2 w-full text-xs">
-      <tbody>
+    <div id={id} className="mt-2 rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-900">
+      <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{help}</p>
+      <table className="mt-2 w-full text-xs">
+        <caption className="pb-1 text-left text-zinc-500">점수 매기는 기준 (1점 공포 ↔ 5점 광기)</caption>
+        <tbody>
         {table.map((r) => (
           <tr key={r.score} className="border-t border-zinc-100 dark:border-zinc-800">
             <td className="py-1 text-zinc-600 dark:text-zinc-400">{r.range}</td>
             <td className="py-1 text-right tabular-nums">{r.score}점 · {levelOf(r.score)}</td>
           </tr>
         ))}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   ) : null;
   return { toggle, body };
 }
@@ -66,7 +70,7 @@ const Dot = () => <span aria-hidden> · </span>;
 
 export function IndicatorRow({ spec, auto = null, autoSource, value, onChange, hint, digits = 2, loading }: Props) {
   const id = useId();
-  const band = useBandTable(spec.table);
+  const band = useExplain(spec.help, spec.table);
   const v = readValue(value, auto);
   const score = spec.score(v);
   const shown = value !== undefined ? value : auto != null ? fmt(auto, digits).replace(/,/g, "") : "";

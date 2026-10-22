@@ -2,9 +2,9 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import type { MarketReaderData } from "@/app/api/reader/market/route";
 import {
-  CHART_READER, CONTRARIAN_READER, HY_STAGES, averageScore, hySpreadScore, type IndicatorKey, type ReaderScore,
+  CHART_READER, CONTRARIAN_READER, HY_HELP, HY_STAGES, averageScore, hySpreadScore, type IndicatorKey, type ReaderScore,
 } from "@/lib/readers";
-import { IndicatorRow, ScorePill, readValue, useBandTable } from "./IndicatorRow";
+import { IndicatorRow, ScorePill, readValue, useExplain } from "./IndicatorRow";
 import { ReaderCard, ExtLink } from "./ReaderCard";
 import { fmt } from "./levels";
 import { useStored } from "./useStored";
@@ -24,7 +24,7 @@ function HyRow({ data, value, onChange, loading }: {
   data: MarketReaderData["hy"]; value: ReaderScore | undefined; onChange: (v: ReaderScore | undefined) => void; loading: boolean;
 }) {
   const id = useId();
-  const band = useBandTable(HY_TABLE);
+  const band = useExplain(HY_HELP, HY_TABLE);
   const auto = hySpreadScore(data);
   const score = value ?? auto;
   return (
@@ -125,7 +125,7 @@ export function MarketView() {
     <>
       <ReaderCard
         title="역발상 판독기"
-        subtitle="투자자 심리가 한쪽으로 쏠렸는지 봅니다. 공포 쪽일수록 장기 매수, 광기 쪽일수록 분할 매도."
+        subtitle="남들이 겁낼 때 사고 들뜰 때 판다는 생각으로, 투자자들의 심리를 5가지 지표로 잽니다."
         score={averageScore(contrarianScores)}
         filled={filled(contrarianScores)}
         total={contrarianScores.length}
@@ -148,7 +148,7 @@ export function MarketView() {
 
       <ReaderCard
         title="차트 판독기 · S&P 500"
-        subtitle="추세와 과열을 봅니다. 이평선 위 종목 비율은 시장 폭, 이격도·RSI는 지수의 위치."
+        subtitle="미국 대표 지수가 너무 많이 올랐는지, 너무 많이 빠졌는지 가격 흐름으로 봅니다."
         score={averageScore(chartScores)}
         filled={filled(chartScores)}
         total={chartScores.length}

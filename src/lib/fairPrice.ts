@@ -1,4 +1,4 @@
-// 소몽 적정주가 템플릿: EPS 성장률을 적정 P/E로 보고(성장률 20% → 20배) 향후 1년 EPS에 곱한다.
+// 적정주가: EPS 성장률을 적정 P/E로 보고(성장률 20% → 20배) 향후 1년 EPS에 곱한다.
 // 보통장은 성장률의 1~2배, 강세장은 1.5~2.5배. 목표주가(보수)는 보통장 상단, 목표주가(강세)는 강세장 상단.
 
 /** [과거 3년, 과거 2년, 과거 1년, 가장 최근, 향후 1년, 향후 2년] 순 희석 EPS. */
@@ -37,7 +37,7 @@ export type Valuation = {
 export type FairPriceResult = {
   growth: (number | null)[];
   medianGrowthPct: number | null;
-  /** 엑셀 안내 ⑤: 역성장이 있거나 변동이 50% 이상이면 보정값(장기 성장률 추정치)을 쓴다. */
+  /** 역성장이 있거나 변동이 50% 이상이면 과거 성장률이 믿을 만하지 않으니 장기 성장률 추정치(보정값)를 권한다. */
   needsAdjustment: boolean;
   forwardEps: number | null;
   currentMultiple: number | null;
