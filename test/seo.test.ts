@@ -1,14 +1,16 @@
 import { describe, it, expect } from "vitest";
 import sitemap from "@/app/sitemap";
 import { metadata as allocateMeta } from "@/app/allocate/layout";
+import { metadata as readerMeta } from "@/app/reader/layout";
 import { SEED_TICKERS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
 
 describe("sitemap", () => {
   const urls = sitemap().map((e) => e.url);
 
-  it("lists the allocate page", () => {
+  it("lists the allocate and reader pages", () => {
     expect(urls).toContain(`${SITE_URL}/allocate`);
+    expect(urls).toContain(`${SITE_URL}/reader`);
   });
 
   it("lists every seed ticker in both markets", () => {
@@ -27,5 +29,12 @@ describe("allocate metadata", () => {
   // image must be restated here.
   it("keeps the share image", () => {
     expect(allocateMeta.openGraph?.images).toBeTruthy();
+  });
+});
+
+describe("reader metadata", () => {
+  it("has its own canonical and keeps the share image", () => {
+    expect(readerMeta.alternates?.canonical).toBe("/reader");
+    expect(readerMeta.openGraph?.images).toBeTruthy();
   });
 });
