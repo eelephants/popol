@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { SITE_URL, OG_BASE } from "@/lib/site";
+import { adsenseClient } from "@/lib/ads";
 
 const TITLE = "관심종목 · 미국·한국 주식 RSI·매수존 자동 분석";
 const DESCRIPTION =
@@ -63,8 +65,18 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const adClient = adsenseClient();
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        {/* AdSense: 사이트 확인용 메타 + 자동 광고 스크립트. 심사 크롤러가 head에서 찾으므로 next/script가 아닌 일반 태그로 둔다. */}
+        {adClient && (
+          <>
+            <meta name="google-adsense-account" content={adClient} />
+            <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`} crossOrigin="anonymous" />
+          </>
+        )}
+      </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
         <script
@@ -72,7 +84,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);}catch(e){}})();`,
           }}
         />
-        <div className="pb-16">{children}</div>
+        <div className="pb-16">
+          {children}
+          <footer className="mx-auto max-w-md px-4 pb-4 pt-2 text-xs text-zinc-500">
+            <Link href="/privacy" className="hover:text-zinc-800 dark:hover:text-zinc-200">개인정보처리방침</Link>
+          </footer>
+        </div>
         <NavBar />
         <script
           dangerouslySetInnerHTML={{
