@@ -25,7 +25,20 @@ export async function getHySpread(
   return { value, percentile1y, rising };
 }
 
-export async function getFearGreed(): Promise<{ score: number; rating: string } | null> {
+/** 하이일드 스프레드의 흐름: 최신값, 1년 저점, 최근 3개월 고점 (역발상 판독기용). */
+export async function getHySpreadPath(
+  fredKey: string,
+): Promise<{ latest: number; low1y: number; peak3m: number } | null> {
+  if (!fredKey) return null;
+  const vals = await fredObservations("BAMLH0A0HYM2", fredKey, 260);
+  if (vals.length === 0) return null;
+  return { latest: vals[0], low1y: Math.min(...vals), peak3m: Math.max(...vals.slice(0, 63)) };
+}
+
+/** CNN 공포탐욕 그래프 데이터. 지수 외에 구성 지표(풋콜비율·VIX 등) 원값도 들어 있다. */
+type CnnSeries = { score?: number; rating?: string; data?: { y?: unknown }[] };
+
+async function getCnnGraph(): Promise<Record<string, CnnSeries | undefined> | null> {
   try {
     const res = await fetch("https://production.dataviz.cnn.io/index/fearandgreed/graphdata", {
       headers: {
@@ -40,12 +53,27 @@ export async function getFearGreed(): Promise<{ score: number; rating: string } 
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
-    const fg = (await res.json())?.fear_and_greed;
-    if (fg?.score == null) return null;
-    return { score: Math.round(fg.score), rating: fg.rating ?? "" };
+    return await res.json();
   } catch {
     return null;
   }
+}
+
+export async function getFearGreed(): Promise<{ score: number; rating: string } | null> {
+  const fg = (await getCnnGraph())?.fear_and_greed;
+  if (fg?.score == null) return null;
+  return { score: Math.round(fg.score), rating: fg.rating ?? "" };
+}
+
+/** 풋콜비율(5일 평균)과 VIX의 최신 원값. */
+export async function getCnnSentiment(): Promise<{ putCall: number | null; vix: number | null }> {
+  const g = await getCnnGraph();
+  const last = (key: string): number | null => {
+    const data = g?.[key]?.data;
+    const y = Array.isArray(data) ? data[data.length - 1]?.y : null;
+    return typeof y === "number" && Number.isFinite(y) ? y : null;
+  };
+  return { putCall: last("put_call_options"), vix: last("market_volatility_vix") };
 }
 
 export async function getUsdKrw(): Promise<number | null> {

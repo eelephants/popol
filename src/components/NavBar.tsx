@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "/", label: "분석", isActive: (p: string) => p === "/" || p.startsWith("/stock") },
+  { href: "/reader", label: "판독기", isActive: (p: string) => p.startsWith("/reader") },
   { href: "/allocate", label: "분배", isActive: (p: string) => p.startsWith("/allocate") },
 ];
 

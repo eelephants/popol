@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { EnrichedStock, MaSignalLevel } from "@/lib/types";
 import { BuyZoneLadder } from "./BuyZoneLadder";
 import { RsiGauge } from "./RsiGauge";
@@ -99,6 +100,14 @@ export function StockAnalysis({ stock }: { stock: EnrichedStock }) {
       </div>
 
       {stock.market === "US" && <ValuationBadges stock={stock} />}
+
+      <Link
+        href={`/reader?view=stock&ticker=${encodeURIComponent(stock.ticker)}`}
+        className="flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2.5 text-sm font-medium hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+      >
+        <span>적정주가 계산 · 주가 판독</span>
+        <span aria-hidden className="text-zinc-400">›</span>
+      </Link>
     </div>
   );
 }
