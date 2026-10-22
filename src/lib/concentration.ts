@@ -25,7 +25,7 @@ export type ConcentrationResult = {
   overLimit: boolean;
 };
 
-/** 엑셀 기준: 시가총액($백만) 2,000억 달러 초과 초대형, 100억 달러 초과 대형, 그 외 중형. */
+/** 시가총액($백만) 2,000억 달러 초과 초대형, 100억 달러 초과 대형, 그 외 중형. */
 export function sizeClass(marketCapM: number | null): SizeClass | null {
   if (marketCapM == null) return null;
   if (marketCapM > 200_000) return "초대형";
