@@ -1,4 +1,4 @@
-export const SITE_URL = "https://popol-topaz.vercel.app";
+export const SITE_URL = "https://stock-budget.site";
 
 /** Shared openGraph fields. A page-level openGraph object replaces the root one
  *  wholesale, so child pages spread this and add `images: OG_IMAGE`; Next fills
