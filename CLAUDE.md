@@ -11,7 +11,7 @@
 
 ## Deploy Configuration (configured by /setup-deploy)
 - Platform: Vercel
-- Production URL: https://popol-topaz.vercel.app
+- Production URL: https://stock-budget.site (가비아 DNS → Vercel. www와 popol-topaz.vercel.app은 308로 이 도메인에 리다이렉트)
 - Branch workflow: feature → `develop`(통합) → `develop`→`main` 머지 → `main` 기준 운영배포. 피처를 main에 직접 머지하지 않음.
 - Deploy workflow: auto-deploy on push (main → production, PR → preview)
 - Deploy status command: HTTP health check
@@ -28,7 +28,7 @@
 ### Env vars (Vercel Project → Settings → Environment Variables) — 모두 선택
 - FINNHUB_API_KEY (optional — valuation badges PER/PSR/PBR/ROE; 국장 종목에는 호출 안 함)
 - FRED_API_KEY (optional — 10yr yield / HY spread)
-- GOOGLE_SITE_VERIFICATION (optional — Search Console HTML-tag 인증. URL 접두어 속성 사용; vercel.app 서브도메인은 DNS 인증 불가)
+- GOOGLE_SITE_VERIFICATION (optional — Search Console HTML-tag 인증. stock-budget.site는 가비아 DNS TXT로 도메인 속성 인증 가능)
 - NAVER_SITE_VERIFICATION (optional — 네이버 서치어드바이저 HTML-tag 인증. 빌드 시 읽으므로 설정 후 재배포 필요)
 # 검색·시세·RSI·매수존·환율·공포지수는 키 없이 동작. 구글 시트 더 이상 사용 안 함.
 
