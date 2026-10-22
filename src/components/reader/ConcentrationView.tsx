@@ -42,7 +42,7 @@ export function ConcentrationView() {
       <section className="mx-3 my-3 rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
         <h2 className="text-base font-semibold">몰빵지수</h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          상위 {MAX_HOLDINGS}종목(ETF 제외)의 투자금으로 한 종목·한 업종 쏠림을 봅니다. {REVIEW_PCT}% 이상 축소 검토, {REDUCE_PCT}% 이상 축소 필요.
+          내 투자금이 한 종목이나 한 업종에 너무 몰려 있지 않은지 봐요. 한 종목이 {REVIEW_PCT}%를 넘으면 줄일지 고민하고, {REDUCE_PCT}%를 넘으면 줄이는 게 좋아요. ETF를 뺀 많이 가진 {MAX_HOLDINGS}종목까지 넣으세요.
         </p>
 
         <div className="mt-3 flex items-end justify-between gap-3">

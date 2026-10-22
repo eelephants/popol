@@ -14,9 +14,9 @@ type PerStock = { eps: (string | undefined)[]; ltg?: string; method?: Method; mu
 const EMPTY: PerStock = { eps: [] };
 
 const METHODS: { id: Method; label: string }[] = [
-  { id: "base", label: "① 기본값" },
-  { id: "adjusted", label: "② 보정값" },
-  { id: "custom", label: "③ 직접 계산" },
+  { id: "base", label: "① 기본" },
+  { id: "adjusted", label: "② 장기 성장률" },
+  { id: "custom", label: "③ 직접 입력" },
 ];
 
 function money(v: number | null | undefined, market: "US" | "KR") {
@@ -176,7 +176,7 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
           {/* 답: 목표주가(보수)와 상승여력 */}
           <div className="mt-3 flex items-end justify-between gap-3">
             <div>
-              <div className="text-xs text-zinc-500">{method === "custom" ? "적정주가 (직접 계산)" : "목표주가 (보수)"}</div>
+              <div className="text-xs text-zinc-500">{method === "custom" ? "적정주가 (직접 입력한 PER 기준)" : "목표주가 (보수적으로 본 값)"}</div>
               {target != null ? (
                 <>
                   <div className="text-3xl font-semibold tabular-nums leading-tight">{money(target, mk)}</div>
@@ -220,35 +220,36 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
             ))}
           </div>
           <p className="mt-1.5 text-xs text-zinc-500">
-            {method === "base" && "EPS 성장률의 중앙값을 적정 P/E로 봅니다 (성장률 20% → 20배)."}
-            {method === "adjusted" && "애널리스트 장기 성장률(3~5년 CAGR)을 적정 P/E로 봅니다."}
-            {method === "custom" && "적정 배수를 직접 정해 향후 1년 EPS에 곱합니다."}
+            {method === "base" && "이 회사 이익(EPS)이 해마다 늘어난 비율의 중간값을 적정 PER로 봐요. 이익이 매년 20%씩 늘면 PER 20배가 적정하다는 식이에요."}
+            {method === "adjusted" && "애널리스트들이 예상한 앞으로 3~5년 이익 성장률을 적정 PER로 봐요. 이익이 해마다 들쭉날쭉한 회사에 더 잘 맞아요."}
+            {method === "custom" && "적정하다고 생각하는 PER을 직접 넣으면, 내년 예상 이익에 곱해서 적정주가를 계산해요."}
           </p>
 
           {r.needsAdjustment && method === "base" && (
             <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300">
-              역성장이 있거나 이익 변동이 50% 이상이라 기본값이 부정확할 수 있습니다. 장기 성장률을 넣고 ② 보정값으로 보세요.
+              이익이 줄었던 해가 있거나 해마다 크게 들쭉날쭉해서 ① 결과가 부정확할 수 있어요. 아래에 장기 성장률을 넣고 ②로 보세요.
             </p>
           )}
 
           {method === "custom" ? (
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <NumField label="적정 배수 (P/E)" value={s.multiple ?? ""} onChange={(v) => setS((p) => ({ ...p, multiple: v }))} suffix="배" placeholder="예: 30" />
+              <NumField label="적정 PER" value={s.multiple ?? ""} onChange={(v) => setS((p) => ({ ...p, multiple: v }))} suffix="배" placeholder="예: 30" />
               <div className="self-end pb-2 text-right text-sm tabular-nums text-zinc-600 dark:text-zinc-400">현재 배수 {fmt(r.currentMultiple, 1)}배</div>
             </div>
           ) : (
             <div className="mt-3 rounded-xl bg-zinc-50 px-3 py-1.5 dark:bg-zinc-900">
-              <Row k="적용 성장률" v={val ? `${fmt(val.growthPct, 1)}%` : "—"} />
-              <Row k="적정 배수 (보통)" v={val ? `${fmt(val.normalMultiple[0], 1)} ~ ${fmt(val.normalMultiple[1], 1)}배` : "—"} />
-              <Row k="적정 배수 (강세장)" v={val ? `${fmt(val.bullMultiple[0], 1)} ~ ${fmt(val.bullMultiple[1], 1)}배` : "—"} />
+              <Row k="적용한 이익 성장률" v={val ? `${fmt(val.growthPct, 1)}%` : "—"} />
+              <Row k="적정 PER (보통 시장)" v={val ? `${fmt(val.normalMultiple[0], 1)} ~ ${fmt(val.normalMultiple[1], 1)}배` : "—"} />
+              <Row k="적정 PER (상승장)" v={val ? `${fmt(val.bullMultiple[0], 1)} ~ ${fmt(val.bullMultiple[1], 1)}배` : "—"} />
               <Row k="적정 가격대" v={val ? `${money(val.fairRange[0], mk)} ~ ${money(val.fairRange[1], mk)}` : "—"} />
-              <Row k="현재 배수 (향후 1년 EPS 기준)" v={r.currentMultiple != null ? `${fmt(r.currentMultiple, 1)}배` : "—"} />
+              <Row k="지금 PER (내년 예상 이익 기준)" v={r.currentMultiple != null ? `${fmt(r.currentMultiple, 1)}배` : "—"} />
             </div>
           )}
 
-          <h3 className="mt-4 text-sm font-semibold">희석 EPS</h3>
+          <h3 className="mt-4 text-sm font-semibold">주당순이익(EPS)</h3>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">회사가 1년 동안 주식 1주당 번 돈이에요. 이 숫자가 해마다 얼마나 늘었는지로 적정 PER을 정합니다.</p>
           <p className="text-xs text-zinc-500">
-            {data?.eps.length ? "과거 4년은 SEC 10-K에서 자동 · " : mk === "KR" ? "국장 종목은 EPS를 직접 넣습니다 · " : ""}
+            {data?.eps.length ? "지난 4년은 미국 공시(SEC)에서 자동으로 채웠어요 · " : mk === "KR" ? "국장 종목은 직접 넣어 주세요 · " : ""}
             향후 2년은 <ExtLink href={`https://seekingalpha.com/symbol/${encodeURIComponent(ticker ?? "")}/earnings/estimates`}>시킹알파 Earnings Estimates</ExtLink>에서
           </p>
           <div className="mt-2 grid grid-cols-3 gap-x-2 gap-y-3">
@@ -266,11 +267,11 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
               );
             })}
           </div>
-          <p className="mt-1 text-xs tabular-nums text-zinc-500">성장률 중앙값 {r.medianGrowthPct != null ? `${fmt(r.medianGrowthPct, 1)}%` : "—"}</p>
+          <p className="mt-1 text-xs tabular-nums text-zinc-500">해마다 늘어난 비율의 중간값 {r.medianGrowthPct != null ? `${fmt(r.medianGrowthPct, 1)}%` : "—"}</p>
 
           <div className="mt-3">
             <NumField
-              label="장기 성장률 · EPS FWD Long Term Growth (3~5년 CAGR)"
+              label="장기 성장률 (애널리스트 예상, 3~5년) · 시킹알파 Growth 탭 'EPS FWD Long Term Growth'"
               value={s.ltg ?? ""}
               onChange={(v) => setS((p) => ({ ...p, ltg: v }))}
               suffix="%"
@@ -279,8 +280,8 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
           </div>
 
           <ul className="mt-3 space-y-1 text-xs text-zinc-500">
-            <li>성장률(기대수익률)과 P/E가 비슷한 것이 좋지만, 호황·상승장에선 프리미엄을 더 받기도 합니다.</li>
-            <li>상승여력이 마이너스면 미래 성장가치가 먼저 반영됐거나 월가 추정치가 보수적인 경우입니다.</li>
+            <li>보통은 이익 성장률과 PER이 비슷하면 적당한 가격으로 봐요. 시장이 좋을 때는 이보다 비싸게 거래되기도 해요.</li>
+            <li>목표주가가 지금 주가보다 낮게 나오면, 시장이 먼 미래 성장까지 미리 값을 매겼거나 애널리스트 예상이 보수적인 경우예요.</li>
           </ul>
         </section>
       )}
@@ -288,7 +289,7 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
       {ticker && (
         <ReaderCard
           title="주가 판독기"
-          subtitle="시장과 종목의 가격 부담을 함께 봅니다. 상승여력과 PEG는 위 계산기 결과를 씁니다."
+          subtitle="시장 전체와 이 종목이 이익에 비해 비싼지 싼지 봅니다. 상승여력과 PEG는 위 계산기 결과로 자동 계산돼요."
           score={averageScore(scores)}
           filled={scores.filter((x) => x != null).length}
           total={scores.length}

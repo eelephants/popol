@@ -10,8 +10,8 @@ import { lookupSector } from "@/lib/sectorMap";
 const spec = (list: typeof CHART_READER, key: string) => list.find((s) => s.key === key)!;
 
 describe("levelOf / averageScore", () => {
-  // 엑셀 예시: 차트 1,1,1,2 → 1.25 불안 / 주가 4,3,5,3 → 3.75 과열 / 역발상 1,3,1,4,3 → 2.4 중립
-  it("matches the three workbooks' worked examples", () => {
+  // 예시: 차트 1,1,1,2 → 1.25 불안 / 주가 4,3,5,3 → 3.75 과열 / 역발상 1,3,1,4,3 → 2.4 중립
+  it("matches the worked examples for the three readers", () => {
     expect(averageScore([1, 1, 1, 2])).toBe(1.25);
     expect(levelOf(1.25)).toBe("불안");
     expect(averageScore([4, 3, 5, 3])).toBe(3.75);
@@ -19,7 +19,7 @@ describe("levelOf / averageScore", () => {
     expect(averageScore([1, 3, 1, 4, 3])).toBeCloseTo(2.4);
     expect(levelOf(2.4)).toBe("중립");
   });
-  it("puts boundaries on the lower level, like the sheet's <= chain", () => {
+  it("puts boundaries on the lower level, with boundaries on the lower level", () => {
     expect(levelOf(1)).toBe("공포");
     expect(levelOf(2)).toBe("불안");
     expect(levelOf(4)).toBe("과열");
@@ -57,7 +57,7 @@ describe("stock reader bands", () => {
     expect([60, 35, 25, 15, 8].map(spec(STOCK_READER, "stockPe").score)).toEqual([5, 4, 3, 2, 1]);
     expect(spec(STOCK_READER, "stockPe").score(-12)).toBeNull();
   });
-  it("scores upside, filling the sheet's 15-20% gap as 2", () => {
+  it("scores upside with 10-20% as 2", () => {
     expect([-3, 2, 7, 12, 17, 25].map(upsideScore)).toEqual([5, 4, 3, 2, 2, 1]);
   });
   it("scores PEG", () => {
@@ -85,7 +85,7 @@ describe("contrarian reader bands", () => {
 });
 
 describe("fairPrice", () => {
-  it("reproduces the TSLA sheet", () => {
+  it("matches the TSLA worked example", () => {
     const r = fairPrice([1.63, 3.62, 4.3, 2.04, 1.69, 2.39], 330, 20.23);
     expect(r.medianGrowthPct).toBeCloseTo(18.78453, 4);
     expect(r.needsAdjustment).toBe(true); // 역성장 + 122% 변동
@@ -99,7 +99,7 @@ describe("fairPrice", () => {
     expect(r.adjusted!.targetBull).toBeCloseTo(85.47175, 4);
     expect(r.adjusted!.upsideBullPct).toBeCloseTo(-74.09947, 3);
   });
-  it("reproduces the MSFT sheet and its direct calculation", () => {
+  it("matches the MSFT worked example and its direct calculation", () => {
     const r = fairPrice([5.76, 8.05, 9.65, 9.68, 11.2, 12.88], 370, 13.98);
     expect(r.medianGrowthPct).toBeCloseTo(15.70248, 4);
     expect(r.base!.targetConservative).toBeCloseTo(351.73554, 4);
@@ -129,7 +129,7 @@ describe("fairPrice", () => {
 });
 
 describe("concentration (몰빵지수)", () => {
-  // 엑셀 예시 포트폴리오, 단위 만원
+  // 예시 포트폴리오, 단위 만원
   const sample = [
     { ticker: "TSLA", name: "Tesla", amount: 1181 },
     { ticker: "NVDA", name: "NVIDIA", amount: 59 },
@@ -150,7 +150,7 @@ describe("concentration (몰빵지수)", () => {
     expect(disc.weightPct).toBeCloseTo(82.97055, 4);
     expect(r.sectors.reduce((s, x) => s + x.weightPct, 0)).toBeCloseTo(100, 9);
   });
-  it("classifies size and weight flags like the sheet", () => {
+  it("classifies size and weight flags", () => {
     expect(sizeClass(3_816_821)).toBe("초대형");
     expect(sizeClass(176_888)).toBe("대형");
     expect(sizeClass(5_963)).toBe("중형");
@@ -165,7 +165,7 @@ describe("concentration (몰빵지수)", () => {
     expect(r.total).toBe(300);
     expect(r.sectors).toEqual([{ sector: "미분류", weightPct: 100 }]);
   });
-  it("looks up the workbook's sector table", () => {
+  it("looks up the sector table", () => {
     expect(lookupSector("o")).toEqual({ sector: "리츠", marketCapM: 5963 });
     expect(lookupSector("BRK-B")?.sector).toBe("금융");
     expect(lookupSector("ZZZZ")).toBeNull();
