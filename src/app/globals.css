@@ -2,5 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light dark; }
-body { @apply bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100; }
+/* 무채색 장부: 크롬은 잉크와 회색, 색은 데이터에만.
+   상승 빨강·하락 파랑(국내 관례), 신호는 온도(차가움 = 공포·과매도 파랑, 뜨거움 = 과열 빨강). */
+:root {
+  color-scheme: light;
+  --ground: #f2f4f7;
+  --surface: #ffffff;
+  --raised: #e9ecf1;
+  --line: #e1e5eb;
+  --rule: #edf0f4;
+  --control: #c9cfd8;
+  --ink: #0b0d10;
+  --muted: #545b66;
+  --faint: #646a75;
+  --accent: #1d5fbf;
+  --up: #c8232c;
+  --down: #1d5fbf;
+  --cold-2-bg: #dbe7fb; --cold-2-ink: #0b3a82;
+  --cold-1-bg: #edf3fd; --cold-1-ink: #1a4d9e;
+  --flat-bg: #e9ecf1;   --flat-ink: #3a404a;
+  --hot-1-bg: #fdeeee;  --hot-1-ink: #a3201f;
+  --hot-2-bg: #fbdcdc;  --hot-2-ink: #7f1414;
+  --warn-bg: #fff4e0;   --warn-ink: #8a4b00;
+  /* 판독기 게이지 다섯 칸: 공포(차가움) → 광기(뜨거움) */
+  --temp-1: #1d5fbf; --temp-2: #7ea3e3; --temp-3: #8b929c; --temp-4: #e3878b; --temp-5: #c8232c;
+}
+
+.dark {
+  color-scheme: dark;
+  --ground: #0c0d0f;
+  --surface: #15171a;
+  --raised: #1f2226;
+  --line: #272a2f;
+  --rule: #1d2024;
+  --control: #3a3f46;
+  --ink: #f2f4f7;
+  --muted: #a6adb7;
+  --faint: #959ca7;
+  --accent: #6b9bf0;
+  --up: #f2555a;
+  --down: #6b9bf0;
+  --cold-2-bg: #13284a; --cold-2-ink: #a9c6ff;
+  --cold-1-bg: #111f36; --cold-1-ink: #93b6f5;
+  --flat-bg: #23262b;   --flat-ink: #c7ccd4;
+  --hot-1-bg: #3a1618;  --hot-1-ink: #ff9d9d;
+  --hot-2-bg: #4a1416;  --hot-2-ink: #ffb8b8;
+  --warn-bg: #3a2a0f;   --warn-ink: #f5c46b;
+  --temp-1: #6b9bf0; --temp-2: #44679f; --temp-3: #6b717b; --temp-4: #a6484d; --temp-5: #f2555a;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 바뀌는 숫자는 모두 자릿수 폭을 맞춘다 */
+.num { font-variant-numeric: tabular-nums; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

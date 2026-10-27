@@ -58,7 +58,10 @@ const JSON_LD = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f4f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0d0f" },
+  ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -69,6 +72,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         {/* AdSense: 사이트 확인용 메타 + 자동 광고 스크립트. 심사 크롤러가 head에서 찾으므로 next/script가 아닌 일반 태그로 둔다. */}
         {adClient && (
           <>
@@ -84,13 +93,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);}catch(e){}})();`,
           }}
         />
-        <div className="pb-16">
+        <NavBar />
+        <div className="pb-20 md:pb-10">
           {children}
-          <footer className="mx-auto max-w-md px-4 pb-4 pt-2 text-xs text-zinc-500">
-            <Link href="/privacy" className="hover:text-zinc-800 dark:hover:text-zinc-200">개인정보처리방침</Link>
+          <footer className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 pb-6 pt-10 text-xs text-muted md:px-8">
+            <span>관심종목 · 공개 데이터를 계산한 참고 자료이며 매매 권유가 아닙니다.</span>
+            <Link href="/privacy" className="hover:text-ink">개인정보처리방침</Link>
           </footer>
         </div>
-        <NavBar />
         <script
           dangerouslySetInnerHTML={{
             __html: `if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}))}`,

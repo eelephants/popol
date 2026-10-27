@@ -16,23 +16,24 @@ const EFFECTIVE = "2026년 10월 23일";
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-6">
-      <h2 className="text-base font-semibold">{title}</h2>
-      <div className="mt-2 space-y-2 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{children}</div>
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <div className="mt-2 space-y-2 text-[15px] leading-relaxed text-ink">{children}</div>
     </section>
   );
 }
 
 const A = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a href={href} target="_blank" rel="noreferrer" className="underline decoration-zinc-300 underline-offset-2">
+  <a href={href} target="_blank" rel="noreferrer" className="underline decoration-control underline-offset-2">
     {children}
   </a>
 );
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-md px-4 pb-10 pt-3">
-      <h1 className="text-lg font-bold">개인정보처리방침</h1>
-      <p className="mt-1 text-xs text-zinc-500">시행일 {EFFECTIVE}</p>
+    <main className="mx-auto max-w-5xl px-4 md:px-8">
+      <div className="max-w-2xl">
+      <h1 className="pt-2 text-2xl font-bold tracking-tight">개인정보처리방침</h1>
+      <p className="mt-1 text-xs text-muted">시행일 {EFFECTIVE}</p>
 
       <Section title="수집하는 정보">
         <p>관심종목은 회원가입이나 로그인이 없고, 이름·연락처·이메일 같은 개인정보를 직접 수집하지 않습니다.</p>
@@ -78,6 +79,7 @@ export default function PrivacyPage() {
           시행일과 함께 알립니다.
         </p>
       </Section>
+      </div>
     </main>
   );
 }

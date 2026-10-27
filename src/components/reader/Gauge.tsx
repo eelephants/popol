@@ -27,34 +27,34 @@ export function Gauge({ score, filled, total }: { score: number | null; filled: 
   return (
     <div>
       <div className="flex items-center gap-4">
-        <svg viewBox="0 0 200 104" className="w-40 shrink-0" role="img" aria-label={level ? `종합 ${fmt(score, 2)}점, ${level}` : "입력된 지표 없음"}>
+        <svg viewBox="0 0 200 104" className="w-44 shrink-0" role="img" aria-label={level ? `종합 ${fmt(score, 2)}점, ${level}` : "입력된 지표 없음"}>
           {LEVELS.map((l, i) => (
-            <path key={l} d={band(i)} className={l === level ? LEVEL_FILL[l] : "fill-zinc-200 dark:fill-zinc-800"} />
+            <path key={l} d={band(i)} className={l === level ? LEVEL_FILL[l] : "fill-raised"} />
           ))}
           {needle && (
             <>
-              <line x1={CX} y1={CY} x2={needle[0]} y2={needle[1]} strokeWidth={3} strokeLinecap="round" className="stroke-zinc-900 dark:stroke-zinc-100" />
-              <circle cx={CX} cy={CY} r={5} className="fill-zinc-900 dark:fill-zinc-100" />
+              <line x1={CX} y1={CY} x2={needle[0]} y2={needle[1]} strokeWidth={3} strokeLinecap="round" className="stroke-ink" />
+              <circle cx={CX} cy={CY} r={5} className="fill-ink" />
             </>
           )}
-          <text x={CX - R_OUT + 2} y={CY + 7} fontSize={11} className="fill-zinc-500">공포</text>
-          <text x={CX + R_OUT - 2} y={CY + 7} fontSize={11} textAnchor="end" className="fill-zinc-500">광기</text>
+          <text x={CX - R_OUT + 2} y={CY + 7} fontSize={13} className="fill-muted">공포</text>
+          <text x={CX + R_OUT - 2} y={CY + 7} fontSize={13} textAnchor="end" className="fill-muted">광기</text>
         </svg>
         <div className="min-w-0">
-          <div className="text-xs text-zinc-500">종합 점수</div>
-          <div className="text-3xl font-semibold tabular-nums leading-tight">{score != null ? fmt(score, 2) : "—"}</div>
+          <div className="text-xs text-muted">종합 점수</div>
+          <div className="num text-[34px] font-bold leading-tight tracking-tight">{score != null ? fmt(score, 2) : "—"}</div>
           {level ? (
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
               <span className={`flex-none whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${LEVEL_PILL[level]}`}>{level}</span>
               <span className="text-sm font-medium">{ACTIONS[level]}</span>
             </div>
           ) : (
-            <div className="mt-1 text-sm text-zinc-500">지표를 하나 이상 넣으면 판단합니다</div>
+            <div className="mt-1 text-sm text-muted">지표를 하나 이상 넣으면 판단합니다</div>
           )}
-          <div className="mt-1 text-xs text-zinc-500 tabular-nums">지표 {filled}/{total}개 반영</div>
+          <div className="mt-1 text-xs text-muted tabular-nums">지표 {filled}/{total}개 반영</div>
         </div>
       </div>
-      {level && <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{LEVEL_HINTS[level]}</p>}
+      {level && <p className="mt-2 text-sm text-ink">{LEVEL_HINTS[level]}</p>}
     </div>
   );
 }

@@ -5,10 +5,10 @@ import { LEVEL_PILL, fmt, parseNum } from "./levels";
 
 export function ScorePill({ score }: { score: ReaderScore | null }) {
   if (score == null)
-    return <span className="w-[4.25rem] flex-none text-center text-sm text-zinc-400">—</span>;
+    return <span className="w-[4.25rem] flex-none text-center text-sm text-faint">—</span>;
   const level = levelOf(score);
   return (
-    <span className={`w-[4.25rem] flex-none whitespace-nowrap rounded-full py-1 text-center text-xs font-medium tabular-nums ${LEVEL_PILL[level]}`}>
+    <span className={`num inline-flex h-6 w-[4.25rem] flex-none items-center justify-center whitespace-nowrap rounded-control text-xs font-medium ${LEVEL_PILL[level]}`}>
       {score} {level}
     </span>
   );
@@ -24,20 +24,20 @@ export function useExplain(help: string, table: { range: string; score: ReaderSc
       aria-expanded={open}
       aria-controls={id}
       onClick={() => setOpen((o) => !o)}
-      className="whitespace-nowrap text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+      className="whitespace-nowrap text-muted hover:text-ink"
     >
       설명 <span aria-hidden className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}>›</span>
     </button>
   );
   const body = open ? (
-    <div id={id} className="mt-2 rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-900">
-      <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{help}</p>
-      <table className="mt-2 w-full text-xs">
-        <caption className="pb-1 text-left text-zinc-500">점수 매기는 기준 (1점 공포 ↔ 5점 광기)</caption>
+    <div id={id} className="mt-2 rounded-control bg-raised px-3 py-2">
+      <p className="text-sm leading-relaxed text-ink">{help}</p>
+      <table className="mt-2 w-full text-[13px]">
+        <caption className="pb-1 text-left text-muted">점수 매기는 기준 (1점 공포 ↔ 5점 광기)</caption>
         <tbody>
         {table.map((r) => (
-          <tr key={r.score} className="border-t border-zinc-100 dark:border-zinc-800">
-            <td className="py-1 text-zinc-600 dark:text-zinc-400">{r.range}</td>
+          <tr key={r.score} className="border-t border-rule">
+            <td className="py-1 text-muted">{r.range}</td>
             <td className="py-1 text-right tabular-nums">{r.score}점 · {levelOf(r.score)}</td>
           </tr>
         ))}
@@ -78,7 +78,7 @@ export function IndicatorRow({ spec, auto = null, autoSource, value, onChange, h
   const source =
     value !== undefined ? (
       auto != null ? (
-        <button type="button" onClick={() => onChange(undefined)} className="underline decoration-zinc-300 underline-offset-2 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <button type="button" onClick={() => onChange(undefined)} className="underline decoration-control underline-offset-2 hover:text-ink">
           자동값 {fmt(auto, digits)}로
         </button>
       ) : (
@@ -93,11 +93,11 @@ export function IndicatorRow({ spec, auto = null, autoSource, value, onChange, h
     );
 
   return (
-    <li className="border-t border-zinc-100 py-2.5 dark:border-zinc-800">
+    <li className="border-t border-rule py-3">
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
-          <label htmlFor={id} className="block text-sm font-medium leading-snug">{spec.label}</label>
-          <div className="text-xs leading-snug text-zinc-500">
+          <label htmlFor={id} className="block text-[15px] font-medium leading-snug">{spec.label}</label>
+          <div className="text-[13px] leading-snug text-muted">
             {spec.horizon && <>{spec.horizon}<Dot /></>}
             {spec.note && <>{spec.note}<Dot /></>}
             {source}
@@ -112,9 +112,9 @@ export function IndicatorRow({ spec, auto = null, autoSource, value, onChange, h
             onChange={(e) => onChange(e.target.value)}
             inputMode="decimal"
             placeholder="—"
-            className="w-[4.75rem] rounded-lg border border-zinc-300 bg-transparent px-2 py-2 text-right text-base tabular-nums outline-none placeholder:text-zinc-400 focus:border-zinc-600 dark:border-zinc-700 dark:focus:border-zinc-400"
+            className="num h-10 w-[4.75rem] rounded-control border border-control bg-surface px-2 text-right text-base outline-none placeholder:text-faint focus:border-accent"
           />
-          <span className="w-6 text-xs text-zinc-500">{spec.unit}</span>
+          <span className="w-6 text-[13px] text-muted">{spec.unit}</span>
         </div>
         <ScorePill score={score} />
       </div>
