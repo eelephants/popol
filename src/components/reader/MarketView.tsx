@@ -84,12 +84,14 @@ export function MarketView() {
   useEffect(load, [load]);
 
   const auto: Partial<Record<IndicatorKey, number | null>> = {
+    bullBear: data?.aaii?.spread ?? null,
     putCall: data?.putCall ?? null,
     vix: data?.vix ?? null,
     disparity200: data?.spx?.disparity200 ?? null,
     rsi: data?.spx?.rsi ?? null,
   };
   const source: Partial<Record<IndicatorKey, string>> = {
+    bullBear: data?.aaii ? `AAII ${data.aaii.reportedDate} 발표 자동` : "AAII 자동",
     putCall: "CNN 자동",
     vix: "CNN 자동",
     disparity200: "S&P 500 자동",
