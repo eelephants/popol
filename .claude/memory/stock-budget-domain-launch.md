@@ -15,7 +15,7 @@ Open items:
 - **Keep the vercel.app → stock-budget.site redirect** at least 180 days, i.e. until ~2027-04-23.
 - **AdSense review pending** (applied 2026-10-23). After approval: turn off anchor ads (they collide with the fixed bottom NavBar); consider vignette ads off on calculator screens.
 - Around 2026-11-06, check indexing: Search Console pages report and Naver collection status for the new domain.
-- Not done, user-optional: `FINNHUB_API_KEY` is not set in Vercel (valuation badges off; reader stock P/E falls back to price ÷ last FY EPS); Korean-stock EPS autofill via DART API was suggested.
+- Not done, user-optional (offered 2026-10-28, user chose docs cleanup first): `FINNHUB_API_KEY` is not set in Vercel, so the stock screen hides its valuation block entirely and the reader stock P/E falls back to price ÷ last FY EPS; Korean-stock EPS autofill via the DART API (needs an opendart.fss.or.kr key) was suggested.
 
 **Why:** These are time-bound or "don't delete yet" facts that nothing in the repo records.
 **How to apply:** Before removing env vars, redirects, or changing ad settings, check this list; surface the pending checks when the user asks what's next.
