@@ -13,6 +13,8 @@ AI 코딩 에이전트(Claude Code, Codex, Cursor, Gemini CLI 등) 공용 진입
 - 로컬에서 `npm run build`를 돌리지 않는다. 실행 중인 dev 서버의 `.next`가 깨진다. 빌드는 CI가 한다.
 - 외부 API 호출은 서버 라우트(`/api/*`)에서만 한다. 키는 Vercel 환경변수에만 둔다.
 - 이미 머지된 PR에 커밋을 더 올리지 않는다. 푸시 전에 `gh pr view <번호> --json state`로 확인한다.
+- 화면을 고칠 때는 CLAUDE.md의 "UI·디자인 시스템" 규칙(색 토큰, 등락·온도 색, `ui.tsx` 부품, 이모지 금지)을 따르고 검사기로 FAIL 0을 확인한다.
+- `develop` → `main` 릴리스는 merge commit으로만 머지한다. squash로 머지되면 다음 릴리스가 충돌한다(해결법은 `.claude/memory/popol-deploy-habits.md`).
 
 ## 메모리 동기화
 

@@ -10,6 +10,17 @@
 - 시장 구분: Yahoo `meta.currency === "KRW"` → 국장(KR). 국장은 ₩ 표시·환율변환 없음·공포지수/금리/환율 카드 숨김·Finnhub 밸류에이션 스킵. `/stock/[ticker]` 직접 진입도 동일. 한글명 검색은 `src/lib/krStocks.ts` 매핑(주요 종목, Yahoo 검색은 한글 0건이라 필요). 계산(RSI·이평선·이격도)은 시장 무관.
 - SEO: 공용 상수·OpenGraph 규칙은 `src/lib/site.ts` 주석 참고(SITE_URL/OG_BASE/OG_IMAGE). 라우트별 metadata가 필요한 클라이언트 페이지는 서버 `layout.tsx`로 분리(`/allocate/layout.tsx`). 사이트맵 종목은 `src/lib/popular.ts`의 `SEED_TICKERS`.
 
+## UI·디자인 시스템 (2026-10 리디자인, #35)
+- 스타일: design-taste-frontend 앱 스타일 **achromatic-ledger**(무채색 장부, seed 2102142778). 크롬(틀·메뉴·버튼)은 잉크와 회색, 색은 데이터에만 쓴다.
+- 색: `src/app/globals.css`의 CSS 변수(라이트 `:root`, 다크 `.dark`) → `tailwind.config.ts` 색 이름(`ground`·`surface`·`raised`·`line`·`rule`·`control`·`ink`·`muted`·`faint`·`accent`·`up`·`down`, 판정용 `cold-2`·`cold-1`·`flat`·`hot-1`·`hot-2`·`warn`). 컴포넌트에 `zinc`·`emerald`·`red-500` 같은 원색 클래스나 hex를 직접 쓰지 않는다.
+- 의미 규칙: 등락은 국내 관례(상승 `up` 빨강 ▲ · 하락 `down` 파랑 ▼, 부호도 글자로). 신호·판정은 온도(과매도·공포 = 차가운 `cold-*`, 과열·광기 = 뜨거운 `hot-*`, 정상 `flat`). 판독기 게이지 다섯 칸은 `--temp-1~5`. 이모지 금지.
+- 글꼴: Pretendard Variable(jsDelivr CDN, `layout.tsx`) 하나. 바뀌는 숫자에는 `.num`(tabular-nums). 화면 제목 24px, 화면의 답이 되는 숫자 34px(현재가·판독 점수·목표주가)가 가장 크다.
+- 부품: `src/components/ui.tsx`(`Panel`·`Segmented`·`Pill`·`Change`·`PageTitle`·`inputCls`·`money`). 카드 반지름 8px·컨트롤 6px, 쉬는 요소에 그림자 없음(떠 있는 검색 메뉴만 예외).
+- 틀: `NavBar.tsx`가 상단 워드마크(+넓은 화면 메뉴·테마 전환)와 휴대폰 하단 탭바를 함께 그린다. 페이지 본문은 `mx-auto max-w-5xl px-4 md:px-8`, 넓은 화면에서 2열.
+- 대표 요소: 종목 분석의 **매수존 띠**(`StockAnalysis.tsx` `BuyZoneStrip`, 52주 고점~−30% 위 매수존 네 칸과 현재가).
+- 검사: `node ~/.claude/skills/design-taste-frontend/scripts/inspect.mjs <url> --app`(1440·768·390px, 결과는 gitignore된 `.taste-skill/`)와 `lint.mjs --app src`. FAIL 0을 유지한다.
+- `tailwind.config.ts`를 바꾸면 dev 서버를 재시작해야 새 클래스가 생긴다.
+
 ## Deploy Configuration (configured by /setup-deploy)
 - Platform: Vercel
 - Production URL: https://stock-budget.site (가비아 DNS → Vercel. www와 popol-topaz.vercel.app은 308로 이 도메인에 리다이렉트)

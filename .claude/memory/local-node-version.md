@@ -13,5 +13,7 @@ The shell's default `node` is v16.13.2, too old for Next 15 (needs ≥18.18) and
 - Tests / typecheck / npm ci: prefix `export PATH=~/.nvm/versions/node/v22.22.2/bin:$PATH;`
 - Dev preview: the committed `.claude/launch.json` (`popol-dev`, `npm run dev`) fails on Node 16. Add a temporary entry with `runtimeExecutable` = the Node 22 binary and `runtimeArgs: ["node_modules/next/dist/bin/next", "dev"]`, then revert it before committing (absolute path is machine-specific).
 - Don't run `npm run build` locally (CLAUDE.md: it breaks the running dev server); CI builds.
+- The design-taste-frontend inspector (`~/.claude/skills/design-taste-frontend/scripts/inspect.mjs --app <url>`) also needs Node 22; its output goes to `.taste-skill/` (gitignored).
+- Changing `tailwind.config.ts` needs a dev-server restart; until then new colour/font classes silently produce nothing.
 
 Related: [[popol-deploy-habits]]

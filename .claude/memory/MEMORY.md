@@ -1,3 +1,3 @@
 - [Local Node version](local-node-version.md) — default node is 16; use nvm Node 22 for tests/typecheck/dev preview
-- [Deploy habits](popol-deploy-habits.md) — user delegates full releases but merges PRs themselves; check PR state before pushing more
+- [Deploy habits](popol-deploy-habits.md) — user delegates full releases but merges PRs themselves (even squashing releases); check PR state, heal divergence with an `-s ours` sync PR
 - [stock-budget.site launch](stock-budget-domain-launch.md) — pending AdSense review, keep verification/redirect until dates, indexing check ~2026-11-06
