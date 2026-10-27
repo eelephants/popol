@@ -108,6 +108,10 @@ export function StockAnalysis({ stock }: { stock: EnrichedStock }) {
         <span>적정주가 계산 · 주가 판독</span>
         <span aria-hidden className="text-zinc-400">›</span>
       </Link>
+
+      <p className="text-xs text-zinc-400">
+        공개 데이터를 계산한 참고 자료예요. 매매 권유가 아니며, 투자 판단과 책임은 본인에게 있습니다.
+      </p>
     </div>
   );
 }
