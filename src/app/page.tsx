@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import type { EnrichedStock, MacroData } from "@/lib/types";
 import { SearchBox, type Picked } from "@/components/SearchBox";
 import { StockAnalysis } from "@/components/StockAnalysis";
@@ -105,14 +106,27 @@ export default function Page() {
       )}
       {stock && !loading && <StockAnalysis stock={stock} />}
       {!stock && !loading && !error && (
-        <p className="px-4 py-10 text-center text-sm text-zinc-400">
-          검색해서 종목을 분석해보세요.
-          <br />
-          RSI·이동평균·매수존(-10~-25%)을 자동 계산합니다.
-        </p>
+        <div className="px-4 py-8 text-center">
+          <p className="text-base font-semibold">이 종목, 지금 비싼 걸까 싼 걸까?</p>
+          <p className="mt-1 text-sm text-zinc-500">
+            종목명만 검색하면 RSI·50/200일선 이격도·고점 대비 매수존(-10~-25%)을 한 화면에 계산해 드려요.
+          </p>
+          <p className="mt-2 text-xs text-zinc-400">무료 · 가입 없음 · 미국장·국장 모두</p>
+        </div>
       )}
 
       <TickerChips label="인기 종목 바로 분석" items={market === "US" ? POPULAR_TICKERS : POPULAR_KR} />
+
+      <nav aria-label="다른 도구" className="grid grid-cols-2 gap-2 px-3 pt-6">
+        <Link href="/reader" className="rounded-xl bg-zinc-50 px-3 py-2.5 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+          <div className="text-sm font-medium">판독기 ›</div>
+          <div className="mt-0.5 text-xs text-zinc-500">시장 공포·과열을 점수로</div>
+        </Link>
+        <Link href="/allocate" className="rounded-xl bg-zinc-50 px-3 py-2.5 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+          <div className="text-sm font-medium">자산 분배 ›</div>
+          <div className="mt-0.5 text-xs text-zinc-500">비율대로 몇 주 살지 계산</div>
+        </Link>
+      </nav>
     </main>
   );
 }
