@@ -58,18 +58,17 @@ export default async function StockPage({ params }: Params) {
   const others = (stock.market === "KR" ? POPULAR_KR : POPULAR_TICKERS).filter((p) => p.ticker !== t);
 
   return (
-    <main className="mx-auto max-w-md pb-10">
-      <div className="px-4 pt-3">
-        <Link href="/" className="text-sm text-zinc-500">← 검색으로 돌아가기</Link>
-        <h1 className="mt-1 text-lg font-bold">
-          {stock.name} <span className="text-sm text-zinc-500">{t}</span> 분석
+    <main className="mx-auto max-w-5xl px-4 md:px-8">
+      <div className="pb-4 pt-2">
+        <Link href="/" className="text-sm text-muted hover:text-ink">← 다른 종목 검색</Link>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight">
+          {stock.name} 분석
         </h1>
+        <p className="mt-1 text-sm text-muted">
+          RSI·이동평균(50/200)·매수존(−10~−25%)·밸류에이션을 실시간 무료 데이터로 계산했어요. 모든 종목에 같은 공식을 써요.
+        </p>
       </div>
       <StockAnalysis stock={stock} />
-      <p className="px-4 pt-4 text-xs text-zinc-400">
-        RSI·이동평균(50/200)·매수존(-10~-25%)·밸류에이션을 실시간 무료 데이터로 자동 계산합니다.
-        계산 공식은 모든 종목에 동일하게 적용됩니다.
-      </p>
       <TickerChips label="다른 종목 분석" items={others} />
     </main>
   );
