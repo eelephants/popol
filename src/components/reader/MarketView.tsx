@@ -28,11 +28,11 @@ function HyRow({ data, value, onChange, loading }: {
   const auto = hySpreadScore(data);
   const score = value ?? auto;
   return (
-    <li className="border-t border-zinc-100 py-2.5 dark:border-zinc-800">
+    <li className="border-t border-rule py-2.5">
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
           <label htmlFor={id} className="block text-sm font-medium leading-snug">하이일드 스프레드</label>
-          <div className="text-xs leading-snug text-zinc-500 tabular-nums">
+          <div className="text-[13px] leading-snug text-muted tabular-nums">
             일간 ·{" "}
             {data
               ? `FRED ${fmt(data.latest)}% · 1년 저점 ${fmt(data.low1y)}% · 3개월 고점 ${fmt(data.peak3m)}%`
@@ -50,7 +50,7 @@ function HyRow({ data, value, onChange, loading }: {
             const v = e.target.value === "" ? undefined : (Number(e.target.value) as ReaderScore);
             onChange(v === auto ? undefined : v);
           }}
-          className="w-[7.5rem] flex-none rounded-lg border border-zinc-300 bg-transparent px-2 py-2 text-sm outline-none focus:border-zinc-600 dark:border-zinc-700 dark:bg-zinc-950"
+          className="w-[7.5rem] flex-none rounded-control border border-control bg-surface px-2 py-2 text-sm outline-none focus:border-accent"
         >
           <option value="">선택 안 함</option>
           {HY_STAGES.map((s) => (
@@ -60,7 +60,7 @@ function HyRow({ data, value, onChange, loading }: {
         <ScorePill score={score ?? null} />
       </div>
       {value !== undefined && auto != null && (
-        <button type="button" onClick={() => onChange(undefined)} className="mt-1 text-xs text-zinc-500 underline decoration-zinc-300 underline-offset-2">
+        <button type="button" onClick={() => onChange(undefined)} className="mt-1 text-[13px] text-muted underline decoration-control underline-offset-2">
           자동 판단({HY_STAGES.find((s) => s.score === auto)?.label})으로 되돌리기
         </button>
       )}
@@ -117,14 +117,14 @@ export function MarketView() {
             ? `자동값 ${new Date(data.updatedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 기준 · 직접 넣은 값은 이 기기에 저장됩니다`
             : "자동값 불러오는 중…"}
       </span>
-      <button type="button" onClick={load} disabled={loading} className="flex-none rounded-lg px-2 py-1 font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
+      <button type="button" onClick={load} disabled={loading} className="h-8 flex-none rounded-control px-2.5 font-medium text-ink transition-colors hover:bg-raised disabled:opacity-50">
         새로고침
       </button>
     </div>
   );
 
   return (
-    <>
+    <div className="grid items-start gap-4 md:grid-cols-2">
       <ReaderCard
         title="역발상 판독기"
         subtitle="남들이 겁낼 때 사고 들뜰 때 판다는 생각으로, 투자자들의 심리를 5가지 지표로 잽니다."
@@ -169,6 +169,6 @@ export function MarketView() {
           />
         ))}
       </ReaderCard>
-    </>
+    </div>
   );
 }

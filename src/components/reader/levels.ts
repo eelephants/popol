@@ -1,21 +1,21 @@
 import type { ReaderLevel } from "@/lib/readers";
 
-// 판독기는 역발상 도구라 공포 쪽이 매수(초록), 광기 쪽이 매도(빨강). 중립은 무채색.
+// 판독기는 온도로 읽는다: 공포(차가운 파랑, 장기 매수 쪽) ↔ 광기(뜨거운 빨강, 분할 매도 쪽). 중립은 무채색.
 export const LEVEL_PILL: Record<ReaderLevel, string> = {
-  공포: "bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
-  불안: "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400",
-  중립: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  과열: "bg-red-50 text-red-800 dark:bg-red-950/60 dark:text-red-400",
-  광기: "bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-300",
+  공포: "bg-cold-2 text-cold-2-ink",
+  불안: "bg-cold-1 text-cold-1-ink",
+  중립: "bg-flat text-flat-ink",
+  과열: "bg-hot-1 text-hot-1-ink",
+  광기: "bg-hot-2 text-hot-2-ink",
 };
 
 /** 게이지에서 현재 구간을 칠하는 색. */
 export const LEVEL_FILL: Record<ReaderLevel, string> = {
-  공포: "fill-emerald-600 dark:fill-emerald-500",
-  불안: "fill-emerald-400 dark:fill-emerald-600",
-  중립: "fill-zinc-500 dark:fill-zinc-400",
-  과열: "fill-red-400 dark:fill-red-600",
-  광기: "fill-red-600 dark:fill-red-500",
+  공포: "fill-[var(--temp-1)]",
+  불안: "fill-[var(--temp-2)]",
+  중립: "fill-[var(--temp-3)]",
+  과열: "fill-[var(--temp-4)]",
+  광기: "fill-[var(--temp-5)]",
 };
 
 export const fmt = (v: number | null | undefined, digits = 2) =>

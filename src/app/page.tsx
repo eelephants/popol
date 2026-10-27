@@ -5,9 +5,9 @@ import type { EnrichedStock, MacroData } from "@/lib/types";
 import { SearchBox, type Picked } from "@/components/SearchBox";
 import { StockAnalysis } from "@/components/StockAnalysis";
 import { MacroDial } from "@/components/MacroDial";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { usSession } from "@/lib/marketHours";
 import { TickerChips } from "@/components/TickerChips";
+import { PageTitle, Panel, Segmented } from "@/components/ui";
 import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
 
 const recentKey = (m: "US" | "KR") => `recent-tickers-${m.toLowerCase()}`;
@@ -55,42 +55,40 @@ export default function Page() {
         });
       }
     } catch {
-      setError("네트워크 오류 — 잠시 후 다시 시도하세요");
+      setError("네트워크 오류예요. 잠시 후 다시 시도하세요.");
     } finally {
       setLoading(false);
     }
   }, [market]);
 
   return (
-    <main className="mx-auto max-w-md pb-10">
-      <div className="flex items-center justify-between px-4 pt-3">
-        <h1 className="text-lg font-bold">종목 분석</h1>
-        <ThemeToggle />
+    <main className="mx-auto max-w-5xl px-4 md:px-8">
+      <PageTitle
+        title="종목 분석"
+        sub={market === "US" ? (session ? `미국장 ${session}` : "미국장") : "국장 종목은 원화 그대로 계산해요"}
+      />
+
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <Segmented
+          label="시장"
+          value={market}
+          onChange={(m) => { setMarket(m); setStock(null); setError(null); }}
+          options={[{ id: "US", label: "미국장" }, { id: "KR", label: "국장" }]}
+          className="md:w-56"
+        />
+        <div className="flex-1">
+          <SearchBox onPick={analyze} market={market} />
+        </div>
       </div>
-      <div className="flex gap-1 px-4 pt-2">
-        {(["US", "KR"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => { setMarket(m); setStock(null); setError(null); }}
-            className={`rounded-full px-3 py-1 text-sm font-medium ${
-              market === m ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800"
-            }`}
-          >
-            {m === "US" ? "미국장" : "국장"}
-          </button>
-        ))}
-      </div>
-      {market === "US" && session && <p className="px-4 pb-1 text-xs text-zinc-500">미국장 {session}</p>}
-      {market === "US" && <MacroDial macro={macro} />}
-      <SearchBox onPick={analyze} market={market} />
 
       {recent.length > 0 && (
-        <div className="flex flex-wrap gap-2 px-3 py-1">
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-xs text-muted">최근 본 종목</span>
           {recent.map((p) => (
             <button
               key={p.symbol}
               onClick={() => analyze(p)}
-              className="rounded-full bg-zinc-100 px-3 py-1 text-xs dark:bg-zinc-800"
+              className="h-8 rounded-control bg-raised px-2.5 text-sm transition-colors hover:bg-line"
             >
               {p.symbol}
             </button>
@@ -98,35 +96,53 @@ export default function Page() {
         </div>
       )}
 
-      {loading && <p className="px-4 py-6 text-center text-sm text-zinc-400">불러오는 중…</p>}
-      {error && (
-        <div className="mx-3 my-2 rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700 dark:bg-red-900/40 dark:text-red-300">
-          {error}
-        </div>
-      )}
-      {stock && !loading && <StockAnalysis stock={stock} />}
-      {!stock && !loading && !error && (
-        <div className="px-4 py-8 text-center">
-          <p className="text-base font-semibold">이 종목, 지금 비싼 걸까 싼 걸까?</p>
-          <p className="mt-1 text-sm text-zinc-500">
-            종목명만 검색하면 RSI·50/200일선 이격도·고점 대비 매수존(-10~-25%)을 한 화면에 계산해 드려요.
-          </p>
-          <p className="mt-2 text-xs text-zinc-400">무료 · 가입 없음 · 미국장·국장 모두</p>
-        </div>
-      )}
+      <div className="mt-5 space-y-4">
+        {market === "US" && <MacroDial macro={macro} />}
 
-      <TickerChips label="인기 종목 바로 분석" items={market === "US" ? POPULAR_TICKERS : POPULAR_KR} />
+        {loading && (
+          <Panel className="px-5 py-10 text-center text-sm text-muted" as="div">불러오는 중…</Panel>
+        )}
+        {error && (
+          <Panel className="px-5 py-4 text-sm" as="div">
+            <span className="font-semibold text-up">불러오지 못했어요.</span> {error}
+          </Panel>
+        )}
+        {stock && !loading && <StockAnalysis stock={stock} />}
 
-      <nav aria-label="다른 도구" className="grid grid-cols-2 gap-2 px-3 pt-6">
-        <Link href="/reader" className="rounded-xl bg-zinc-50 px-3 py-2.5 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800">
-          <div className="text-sm font-medium">판독기 ›</div>
-          <div className="mt-0.5 text-xs text-zinc-500">시장 공포·과열을 점수로</div>
-        </Link>
-        <Link href="/allocate" className="rounded-xl bg-zinc-50 px-3 py-2.5 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800">
-          <div className="text-sm font-medium">자산 분배 ›</div>
-          <div className="mt-0.5 text-xs text-zinc-500">비율대로 몇 주 살지 계산</div>
-        </Link>
-      </nav>
+        {!stock && !loading && !error && (
+          <Panel className="grid gap-6 p-5 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:p-6">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">이 종목, 지금 비싼 걸까 싼 걸까?</h2>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted">
+                종목명만 검색하면 52주 고점 대비 매수존(−10~−25%), RSI, 50·200일선과의 거리를 한 화면에 계산해 드려요.
+                가입 없이 무료이고, 미국장·국장 모두 돼요.
+              </p>
+            </div>
+            <ul className="divide-y divide-rule self-start rounded-card border border-line">
+              <li>
+                <Link href="/reader" className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-raised">
+                  <span>
+                    <span className="block text-[15px] font-semibold">판독기</span>
+                    <span className="block text-sm text-muted">시장 공포·과열을 점수로, 적정주가까지</span>
+                  </span>
+                  <span aria-hidden className="text-muted">→</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/allocate" className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-raised">
+                  <span>
+                    <span className="block text-[15px] font-semibold">자산 분배</span>
+                    <span className="block text-sm text-muted">비율대로 몇 주씩 살지 계산</span>
+                  </span>
+                  <span aria-hidden className="text-muted">→</span>
+                </Link>
+              </li>
+            </ul>
+          </Panel>
+        )}
+      </div>
+
+      <TickerChips label="많이 보는 종목" items={market === "US" ? POPULAR_TICKERS : POPULAR_KR} />
     </main>
   );
 }
