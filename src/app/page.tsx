@@ -7,6 +7,7 @@ import { StockAnalysis } from "@/components/StockAnalysis";
 import { MacroDial } from "@/components/MacroDial";
 import { usSession } from "@/lib/marketHours";
 import { TickerChips } from "@/components/TickerChips";
+import { DemoVideo } from "@/components/DemoVideo";
 import { PageTitle, Panel, Segmented } from "@/components/ui";
 import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
 
@@ -110,34 +111,37 @@ export default function Page() {
         {stock && !loading && <StockAnalysis stock={stock} />}
 
         {!stock && !loading && !error && (
-          <Panel className="grid gap-6 p-5 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:p-6">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">이 종목, 지금 비싼 걸까 싼 걸까?</h2>
-              <p className="mt-2 text-[15px] leading-relaxed text-muted">
-                종목명만 검색하면 52주 고점 대비 매수존(−10~−25%), RSI, 50·200일선과의 거리를 한 화면에 계산해 드려요.
-                가입 없이 무료이고, 미국장·국장 모두 돼요.
-              </p>
+          <Panel className="grid gap-6 p-5 md:grid-cols-[minmax(0,1fr)_240px] md:gap-10 md:p-6">
+            <div className="flex flex-col gap-5">
+              <div>
+                <h2 className="text-xl font-bold tracking-tight">이 종목, 지금 비싼 걸까 싼 걸까?</h2>
+                <p className="mt-2 text-[15px] leading-relaxed text-muted">
+                  종목명만 검색하면 52주 고점 대비 매수존(−10~−25%), RSI, 50·200일선과의 거리를 한 화면에 계산해 드려요.
+                  가입 없이 무료이고, 미국장·국장 모두 돼요.
+                </p>
+              </div>
+              <ul className="divide-y divide-rule rounded-card border border-line">
+                <li>
+                  <Link href="/reader" className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-raised">
+                    <span>
+                      <span className="block text-[15px] font-semibold">판독기</span>
+                      <span className="block text-sm text-muted">시장 공포·과열을 점수로, 적정주가까지</span>
+                    </span>
+                    <span aria-hidden className="text-muted">→</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/allocate" className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-raised">
+                    <span>
+                      <span className="block text-[15px] font-semibold">자산 분배</span>
+                      <span className="block text-sm text-muted">비율대로 몇 주씩 살지 계산</span>
+                    </span>
+                    <span aria-hidden className="text-muted">→</span>
+                  </Link>
+                </li>
+              </ul>
             </div>
-            <ul className="divide-y divide-rule self-start rounded-card border border-line">
-              <li>
-                <Link href="/reader" className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-raised">
-                  <span>
-                    <span className="block text-[15px] font-semibold">판독기</span>
-                    <span className="block text-sm text-muted">시장 공포·과열을 점수로, 적정주가까지</span>
-                  </span>
-                  <span aria-hidden className="text-muted">→</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/allocate" className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-raised">
-                  <span>
-                    <span className="block text-[15px] font-semibold">자산 분배</span>
-                    <span className="block text-sm text-muted">비율대로 몇 주씩 살지 계산</span>
-                  </span>
-                  <span aria-hidden className="text-muted">→</span>
-                </Link>
-              </li>
-            </ul>
+            <DemoVideo />
           </Panel>
         )}
       </div>
