@@ -47,8 +47,8 @@ export default function PrivacyPage() {
 
       <Section title="서버를 거치는 정보">
         <p>
-          종목을 조회하면 종목 코드(예: AAPL)가 서버를 거쳐 시세·재무 데이터 제공처(Yahoo Finance, 미국 SEC EDGAR, CNN, FRED, Finnhub,
-          Frankfurter)로 전달됩니다. 개인을 식별하는 정보는 함께 보내지 않습니다.
+          종목을 조회하면 종목 코드(예: AAPL)가 서버를 거쳐 시세·재무 데이터 제공처(Yahoo Finance, 미국 SEC EDGAR, Nasdaq, AAII, CNN, FRED,
+          Finnhub, Frankfurter)로 전달됩니다. 개인을 식별하는 정보는 함께 보내지 않습니다.
         </p>
         <p>사이트는 Vercel에서 운영되며, 접속 시 IP 주소·브라우저 정보 같은 기술적 기록이 호스팅 운영을 위해 처리될 수 있습니다.</p>
       </Section>

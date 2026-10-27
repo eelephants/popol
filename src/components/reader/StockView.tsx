@@ -96,10 +96,17 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
       autoEps[pos] = e.value;
       epsYears[pos] = `FY${e.periodEnd.slice(0, 4)}`;
     });
+    // 향후 1·2년은 Nasdaq 컨센서스
+    data.forward?.next.forEach((f, i) => {
+      autoEps[4 + i] = f.eps;
+      epsYears[4 + i] = f.label;
+    });
   }
+  const autoLtg = data?.forward?.growthPct != null ? Math.round(data.forward.growthPct * 10) / 10 : null;
+  const overridden = s.eps.some((v, i) => v !== undefined && autoEps[i] != null) || (s.ltg !== undefined && autoLtg != null);
   const eps = autoEps.map((a, i) => readValue(s.eps[i], a));
   const price = data?.price ?? null;
-  const ltg = parseNum(s.ltg);
+  const ltg = readValue(s.ltg, autoLtg);
   const r = fairPrice(eps, price, ltg);
   const method: Method = s.method ?? (r.needsAdjustment && ltg != null ? "adjusted" : "base");
   const val: Valuation | null = method === "adjusted" ? r.adjusted : method === "base" ? r.base : null;
@@ -249,8 +256,27 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
           <h3 className="mt-4 text-sm font-semibold">주당순이익(EPS)</h3>
           <p className="text-xs text-zinc-600 dark:text-zinc-400">회사가 1년 동안 주식 1주당 번 돈이에요. 이 숫자가 해마다 얼마나 늘었는지로 적정 PER을 정합니다.</p>
           <p className="text-xs text-zinc-500">
-            {data?.eps.length ? "지난 4년은 미국 공시(SEC)에서 자동으로 채웠어요 · " : mk === "KR" ? "국장 종목은 직접 넣어 주세요 · " : ""}
-            향후 2년은 <ExtLink href={`https://seekingalpha.com/symbol/${encodeURIComponent(ticker ?? "")}/earnings/estimates`}>시킹알파 Earnings Estimates</ExtLink>에서
+            {data?.eps.length ? "지난 4년은 미국 공시(SEC)" : mk === "KR" ? "국장 종목은 직접 넣어 주세요" : "지난 4년은 직접 넣어 주세요"}
+            {data?.forward?.next.length ? (
+              <>, 향후 2년은 애널리스트 예상 평균(Nasdaq)에서 자동으로 채웠어요. 숫자는 고쳐 쓸 수 있어요.</>
+            ) : (
+              <>
+                {" · "}향후 2년은{" "}
+                <ExtLink href={`https://seekingalpha.com/symbol/${encodeURIComponent(ticker ?? "")}/earnings/estimates`}>시킹알파 Earnings Estimates</ExtLink>에서
+              </>
+            )}
+            {overridden && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  onClick={() => setS((p) => ({ ...p, eps: [], ltg: undefined }))}
+                  className="underline decoration-zinc-300 underline-offset-2 hover:text-zinc-800 dark:hover:text-zinc-200"
+                >
+                  자동값으로 되돌리기
+                </button>
+              </>
+            )}
           </p>
           <div className="mt-2 grid grid-cols-3 gap-x-2 gap-y-3">
             {EPS_LABELS.map((label, i) => {
@@ -271,8 +297,15 @@ export function StockView({ initialTicker }: { initialTicker?: string }) {
 
           <div className="mt-3">
             <NumField
-              label="장기 성장률 (애널리스트 예상, 3~5년) · 시킹알파 Growth 탭 'EPS FWD Long Term Growth'"
-              value={s.ltg ?? ""}
+              label="장기 성장률 (앞으로 몇 년간 이익이 해마다 늘 것으로 보는 비율)"
+              value={s.ltg !== undefined ? s.ltg : autoLtg != null ? String(autoLtg) : ""}
+              sub={
+                s.ltg === undefined && data?.forward?.growthBasis
+                  ? `Nasdaq 애널리스트 예상 · ${data.forward.growthBasis}`
+                  : s.ltg === undefined
+                    ? "시킹알파 Growth 탭 'EPS FWD Long Term Growth' 값을 넣어도 돼요"
+                    : "직접 입력"
+              }
               onChange={(v) => setS((p) => ({ ...p, ltg: v }))}
               suffix="%"
               placeholder="예: 15"
