@@ -12,5 +12,12 @@ const nextConfig = {
       },
     ];
   },
+  // PWA 설정 파일은 페이지가 아니므로 색인하지 않는다(Search Console "크롤링됨 - 현재 색인이 생성되지 않음" 정리).
+  async headers() {
+    return ["/manifest.webmanifest", "/sw.js"].map((source) => ({
+      source,
+      headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+    }));
+  },
 };
 export default nextConfig;
