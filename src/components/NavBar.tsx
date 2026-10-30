@@ -7,6 +7,7 @@ const TABS = [
   { href: "/", label: "분석", isActive: (p: string) => p === "/" || p.startsWith("/stock") },
   { href: "/reader", label: "판독기", isActive: (p: string) => p.startsWith("/reader") },
   { href: "/allocate", label: "분배", isActive: (p: string) => p.startsWith("/allocate") },
+  { href: "/guide", label: "가이드", isActive: (p: string) => p.startsWith("/guide") },
 ];
 
 /** 제품 표식: 고점에서 아래로 내려가는 매수존 사다리 네 칸. 마지막 칸이 지금 가격. */

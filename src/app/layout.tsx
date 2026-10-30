@@ -57,6 +57,14 @@ const JSON_LD = {
   inLanguage: "ko",
 };
 
+const FOOTER_LINKS = [
+  ["/about", "소개"],
+  ["/guide", "가이드"],
+  ["/terms", "이용약관"],
+  ["/privacy", "개인정보처리방침"],
+  ["/contact", "문의"],
+] as const;
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f2f4f7" },
@@ -98,7 +106,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <footer className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 pb-6 pt-10 text-xs text-muted md:px-8">
             <span>관심종목 · 공개 데이터를 계산한 참고 자료이며 매매 권유가 아닙니다.</span>
-            <Link href="/privacy" className="hover:text-ink">개인정보처리방침</Link>
+            <nav aria-label="사이트 정보" className="flex flex-wrap gap-x-4 gap-y-1">
+              {FOOTER_LINKS.map(([href, label]) => (
+                <Link key={href} href={href} className="hover:text-ink">{label}</Link>
+              ))}
+            </nav>
           </footer>
         </div>
         <script
