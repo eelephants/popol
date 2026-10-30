@@ -6,6 +6,9 @@ import { POPULAR_TICKERS, POPULAR_KR, SEED_TICKERS } from "@/lib/popular";
 import { KR_STOCKS } from "@/lib/krStocks";
 import { StockAnalysis } from "@/components/StockAnalysis";
 import { TickerChips } from "@/components/TickerChips";
+import { GuideLinks } from "@/components/GuideLinks";
+import { Panel } from "@/components/ui";
+import { stockNarrative } from "@/lib/stockNarrative";
 import { OG_BASE, OG_IMAGE } from "@/lib/site";
 
 type Params = { params: Promise<{ ticker: string }> };
@@ -56,6 +59,7 @@ export default async function StockPage({ params }: Params) {
   const stock = await getEnrichedStock(t, displayName(t));
   if (!stock) notFound();
   const others = (stock.market === "KR" ? POPULAR_KR : POPULAR_TICKERS).filter((p) => p.ticker !== t);
+  const narrative = stockNarrative(stock);
 
   return (
     <main className="mx-auto max-w-5xl px-4 md:px-8">
@@ -69,7 +73,27 @@ export default async function StockPage({ params }: Params) {
         </p>
       </div>
       <StockAnalysis stock={stock} />
+      {narrative.length > 0 && (
+        <Panel className="mt-4 p-5">
+          <h2 className="text-base font-semibold">지금 지표 읽기</h2>
+          <dl className="mt-3 space-y-3 text-[15px] leading-relaxed">
+            {narrative.map((n) => (
+              <div key={n.topic}>
+                <dt className="text-sm font-semibold text-muted">{n.topic}</dt>
+                <dd>
+                  {n.text}{" "}
+                  <Link href={`/guide/${n.guide}`} className="whitespace-nowrap text-sm text-muted underline decoration-control underline-offset-2 hover:text-ink">
+                    읽는 법
+                  </Link>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-4 text-xs text-muted">공개 데이터를 같은 공식으로 계산한 참고 자료이며 매매 권유가 아닙니다.</p>
+        </Panel>
+      )}
       <TickerChips label="다른 종목 분석" items={others} />
+      <GuideLinks label="지표 가이드" slugs={["buy-zone", "rsi", "moving-average", "valuation-ratios"]} />
     </main>
   );
 }
