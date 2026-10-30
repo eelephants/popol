@@ -4,6 +4,11 @@ import { metadata as allocateMeta } from "@/app/allocate/layout";
 import { metadata as readerMeta } from "@/app/reader/layout";
 import { SEED_TICKERS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
+import type { NextConfig } from "next";
+// @ts-expect-error -- next.config.mjs is plain JS and allowJs is off
+import rawNextConfig from "../next.config.mjs";
+
+const nextConfig: NextConfig = rawNextConfig;
 
 describe("sitemap", () => {
   const urls = sitemap().map((e) => e.url);
@@ -29,6 +34,16 @@ describe("allocate metadata", () => {
   // image must be restated here.
   it("keeps the share image", () => {
     expect(allocateMeta.openGraph?.images).toBeTruthy();
+  });
+});
+
+describe("non-page files", () => {
+  it("send X-Robots-Tag: noindex for the PWA manifest and service worker", async () => {
+    const rules = await nextConfig.headers!();
+    for (const path of ["/manifest.webmanifest", "/sw.js"]) {
+      const rule = rules.find((r) => r.source === path);
+      expect(rule?.headers).toContainEqual({ key: "X-Robots-Tag", value: "noindex" });
+    }
   });
 });
 
