@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OG_BASE, OG_IMAGE } from "@/lib/site";
+import { GuideLinks } from "@/components/GuideLinks";
 
 const title = "자산 분배 계산기 — 비율별 매수 주수·소수점 매수";
 const description =
@@ -14,5 +15,13 @@ export const metadata: Metadata = {
 };
 
 export default function AllocateLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      {/* 계산 화면 아래 해설 링크: 도구만 있는 화면에 읽을 거리를 붙인다 */}
+      <div className="mx-auto max-w-5xl px-4 md:px-8">
+        <GuideLinks label="자산 분배 가이드" slugs={["allocation", "concentration", "us-kr-market"]} />
+      </div>
+    </>
+  );
 }

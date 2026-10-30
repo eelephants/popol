@@ -8,6 +8,7 @@ import { MacroDial } from "@/components/MacroDial";
 import { usSession } from "@/lib/marketHours";
 import { TickerChips } from "@/components/TickerChips";
 import { DemoVideo } from "@/components/DemoVideo";
+import { GuideLinks } from "@/components/GuideLinks";
 import { PageTitle, Panel, Segmented } from "@/components/ui";
 import { POPULAR_TICKERS, POPULAR_KR } from "@/lib/popular";
 
@@ -147,6 +148,7 @@ export default function Page() {
       </div>
 
       <TickerChips label="많이 보는 종목" items={market === "US" ? POPULAR_TICKERS : POPULAR_KR} />
+      <GuideLinks label="처음이라면 읽어 보세요" slugs={["buy-zone", "rsi", "disparity", "fair-price"]} />
     </main>
   );
 }
